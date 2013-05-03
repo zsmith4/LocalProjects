@@ -46,7 +46,7 @@ namespace FileOrganizer
         	return date;
         }
 
-        static DateTime FindStringMonthWithDigitYear(string input)
+        public static DateTime FindStringMonthWithDigitYear(string input)
         {
             int moNum = 0;
         	DateTime date;

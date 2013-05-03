@@ -13,7 +13,7 @@ namespace FileOrganizer
 		    Month month;
 
             //Unknown
-            month = new Month { MonthInt = 0, FullName = "Unknown", Abbreviation = "Unknown", TwoDigitFormat = "00" };
+            month = new Month { MonthInt = 0, FullName = "Unknown", Abbreviation = "Unknown", TwoDigitFormat = "99" };
             months.Add(month);
 
             //January

@@ -14,6 +14,8 @@ namespace FileOrganizer
 {
 	public partial class MainForm : Form
 	{
+		protected bool _overwrite = false;
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -36,6 +38,10 @@ namespace FileOrganizer
 
 		private void btnRun_Click(object sender, EventArgs e)
 		{
+
+			btnRun.Text = "Running...";
+			btnRun.Enabled = false;
+			_overwrite = this.chkDestination.Checked;
 			var source = new DirectoryInfo(txtSourceDirectory.Text);
 			var dest = new DirectoryInfo(txtOutputDirectory.Text);
 
@@ -75,38 +81,41 @@ namespace FileOrganizer
 								dirDate = RegularExpressions.ParseDate(DateFunctions.RemoveSpecialChars(currDir.Name));
 
 								//copy directory
-								CopyToNewDir(dirDate, dest, currDir);
+								CopyToNewDir(dirDate, dest, currDir, _overwrite);
 							}
 						}
 						else
 						{
 							//copy directory
-							CopyToNewDir(dirDate, dest, currDir);
+							CopyToNewDir(dirDate, dest, currDir, _overwrite);
 						}
 
 						//copy directory
-						CopyToNewDir(dirDate, dest, currDir);
+						CopyToNewDir(dirDate, dest, currDir, _overwrite);
 					}
 				}
 				else
 				{
 					//copy directory
-					CopyToNewDir(dirDate, dest, currDir);
+					CopyToNewDir(dirDate, dest, currDir, _overwrite);
 				}
 			}
+
+			btnRun.Enabled = true;
+			btnRun.Text = "Go";
 
 			//show complete
 			MessageBox.Show("Complete", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 
-		protected static void CopyToNewDir(DateTime dirDate, DirectoryInfo dest, DirectoryInfo source)
+		protected static void CopyToNewDir(DateTime dirDate, DirectoryInfo dest, DirectoryInfo source, bool overwrite)
 		{
 			dirDate.ToString("D", CultureInfo.CreateSpecificCulture("en-US"));
 
 			var dirNewName = DateFunctions.GetNewFullDirPath(dest, dirDate, source.Name);
 
 			var diNewName = new DirectoryInfo(dirNewName);
-			Utilities.CopyTo(source, diNewName);
+			Utilities.CopyTo(source, diNewName, overwrite);
 
 		}
 	}

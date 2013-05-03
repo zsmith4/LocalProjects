@@ -23,14 +23,45 @@ namespace FileOrganizer
 
         internal static string GetNewFullDirPath(DirectoryInfo dest, DateTime dirDate, string dirDesc)
         {
+            //Detect if dir only had month and year in odd format
+            string dirNewName;
+			string monthDir = dirDate.Year + "-" + dirDate.Month.ToString().PadLeft(2, '0');
 
-            var dirNewName = string.Format("{0}\\{1}\\{2}\\{3}",
-                               dest,
-                               dirDate.Year,
-                               GetLongMonthDirName(dirDate.Month),
-                               dirDesc
-                               );
+			if (DirectoryDescOnlyContainsDate(dirDesc))
+			{
+				dirNewName = string.Format("{0}\\{1}\\{2}",
+						dest,
+						dirDate.Year,
+						monthDir
+						);
+			}
+			else
+			{
+				dirNewName = string.Format("{0}\\{1}\\{2}\\{3}",
+						dest,
+						dirDate.Year,
+						monthDir,
+						dirDesc
+						);
+			}
+                          
             return dirNewName;
+        }
+
+        private static bool DirectoryDescOnlyContainsDate(string dirDesc)
+        {
+
+            //strip year and month out
+            string remain;
+            int year = FindYear(dirDesc, out remain);
+            int month = FindMonth(remain, out remain);
+
+            if(String.IsNullOrEmpty(remain))
+            {
+                return true;
+            }
+
+            return false;
         }
 
 		public static string RemoveSpecialChars(string input)
@@ -44,109 +75,109 @@ namespace FileOrganizer
 			return output;
         }
 
-        internal static string GetLongMonthDirName(int month)
-        {
-            var retval = "00 Unknown";
-            foreach (var mo in mMonths)
-            {
-                if (mo.MonthInt == month)
-                {
-                    retval = mo.TwoDigitFormat + " " + mo.FullName;
-                }
-            }
-            return retval;
-		}
-
-		#region Unused Code
-
-		//internal static DateTime GetReferenceDate(FileInfo file)
+		//internal static string GetLongMonthDirName(int month)
 		//{
-		//    //use last written
-		//    var dateTaken = file.LastWriteTime;
-		//    //dateTaken = file.CreationTime;
-
-		//    return dateTaken;
-		//}
-
-		//internal static string ParseDescFromDirName(string dirName)
-		//{
-		//    var dirDesc = dirName.Substring(9, dirName.Length - 9);
-		//    return dirDesc;
-		//}
-
-		//internal static bool IsFullDateInDir(string dirName)
-		//{
-		//    int i;
-		//    return dirName.Length >= 8 && int.TryParse(dirName.Substring(0, 8), out i);
-		//}
-
-		//internal static bool RemoveIfContains(string input, string value, out string remains)
-		//{
-		//    input.ToLowerInvariant();
-		//    value.ToLowerInvariant();
-		//    if (input.Contains(value))
-		//    {
-		//        remains = input.Replace(value, string.Empty).Trim();
-		//        return true;
-		//    }
-            
-		//    remains = string.Empty;
-		//    return false;
-		//}
-
-		//internal static int FindMonth(string input, out string remains)
-		//{
+		//    var retval = "00 Unknown";
 		//    foreach (var mo in mMonths)
 		//    {
-		//        //check for full name
-		//        if(RemoveIfContains(input, mo.FullName, out remains))
+		//        if (mo.MonthInt == month)
 		//        {
-		//            return mo.MonthInt;
-		//        }
-
-		//        //check for abbreviation
-		//        if(RemoveIfContains(input, mo.Abbreviation, out remains))
-		//        {
-		//            return mo.MonthInt;
-		//        }
-
-		//        //check for two-digit format
-		//        if(RemoveIfContains(input, mo.TwoDigitFormat, out remains))
-		//        {
-		//            return mo.MonthInt;
+		//            retval = mo.TwoDigitFormat + " " + mo.FullName;
 		//        }
 		//    }
-
-		//    remains = string.Empty;
-		//    return 0;
+		//    return retval;
 		//}
 
-		//internal static int FindYear(string input, out string remains)
-		//{
-		//    foreach (var yr in mYears)
-		//    {
-		//        //check for full date
-		//        if (RemoveIfContains(input, yr.YearInt.ToString(), out remains))
-		//        {
-		//            return yr.YearInt;
-		//        }
+        #region Unused Code
 
-		//        //check for abbreviation
-		//        if (RemoveIfContains(input, yr.TwoDigitFormat, out remains))
-		//        {
-		//            return yr.YearInt;
-		//        }
-		//    }
+        internal static DateTime GetReferenceDate(FileInfo file)
+        {
+            //use last written
+            var dateTaken = file.LastWriteTime;
+            //dateTaken = file.CreationTime;
 
-		//    remains = string.Empty;
-		//    return 0;
+            return dateTaken;
+        }
 
-		//}
-		//internal static DateTime ParseLongDateFromDirName(string dirName)
-		//{
-		//    var dirDate = new DateTime(Convert.ToInt16(dirName.Substring(0, 4)), Convert.ToInt16(dirName.Substring(4, 2)), Convert.ToInt16(dirName.Substring(6, 2)));
-		//    return dirDate;
-		//}
+        internal static string ParseDescFromDirName(string dirName)
+        {
+            var dirDesc = dirName.Substring(9, dirName.Length - 9);
+            return dirDesc;
+        }
+
+        internal static bool IsFullDateInDir(string dirName)
+        {
+            int i;
+            return dirName.Length >= 8 && int.TryParse(dirName.Substring(0, 8), out i);
+        }
+
+        internal static bool RemoveIfContains(string input, string value, out string remains)
+        {
+            input.ToLowerInvariant();
+            value.ToLowerInvariant();
+            if (input.Contains(value))
+            {
+                remains = input.Replace(value, string.Empty).Trim();
+                return true;
+            }
+
+            remains = string.Empty;
+            return false;
+        }
+
+        internal static int FindMonth(string input, out string remains)
+		{
+		    foreach (var mo in mMonths)
+		    {
+		        //check for full name
+		        if(RemoveIfContains(input, mo.FullName, out remains))
+		        {
+		            return mo.MonthInt;
+		        }
+
+		        //check for abbreviation
+		        if(RemoveIfContains(input, mo.Abbreviation, out remains))
+		        {
+		            return mo.MonthInt;
+		        }
+
+		        //check for two-digit format
+		        if(RemoveIfContains(input, mo.TwoDigitFormat, out remains))
+		        {
+		            return mo.MonthInt;
+		        }
+		    }
+
+		    remains = string.Empty;
+		    return 0;
+		}
+
+        internal static int FindYear(string input, out string remains)
+        {
+            foreach (var yr in mYears)
+            {
+                //check for full date
+                if (RemoveIfContains(input, yr.YearInt.ToString(), out remains))
+                {
+                    return yr.YearInt;
+                }
+
+                //check for abbreviation
+                //if (RemoveIfContains(input, yr.TwoDigitFormat, out remains))
+                //{
+                //    return yr.YearInt;
+                //}
+            }
+
+            remains = string.Empty;
+            return 0;
+
+        }
+        internal static DateTime ParseLongDateFromDirName(string dirName)
+        {
+            var dirDate = new DateTime(Convert.ToInt16(dirName.Substring(0, 4)), Convert.ToInt16(dirName.Substring(4, 2)), Convert.ToInt16(dirName.Substring(6, 2)));
+            return dirDate;
+        }
 		#endregion
 
 	}
