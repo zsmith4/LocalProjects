@@ -284,31 +284,33 @@ namespace FileOrganizer
 					var fiExist = new FileInfo(pathWithName);
 					var di = new DirectoryInfo(path);
 
-					if (fiExist.Exists)
-					{
-						if (!skip)
-						{
-							if (!di.Exists)
-							{
-								di.Create();
-							}
-
-							if (overwrite)
-							{
-								file.CopyTo(pathWithName, true);
-							}
-							
-						}
-					}
-					else
+					//never overwrite
+					if (!fiExist.Exists)
 					{
 						if (!di.Exists)
 						{
 							di.Create();
 						}
 
-						file.CopyTo(pathWithName, overwrite);
+						file.MoveTo(pathWithName);
 					}
+
+					//else
+					//{
+					//    if (!skip)
+					//    {
+					//        if (!di.Exists)
+					//        {
+					//            di.Create();
+					//        }
+
+					//        if (overwrite)
+					//        {
+					//            file.MoveTo(pathWithName);
+					//        }
+
+					//    }
+					//}
 				}
 			}
 		}
