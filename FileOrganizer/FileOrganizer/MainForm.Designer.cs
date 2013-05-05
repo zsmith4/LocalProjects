@@ -43,6 +43,7 @@
 			this.btnSortIndividual = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.chkSortCopy = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -168,6 +169,7 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.chkSortCopy);
 			this.groupBox1.Controls.Add(this.textBox1);
 			this.groupBox1.Controls.Add(this.btnSortIndividual);
 			this.groupBox1.Location = new System.Drawing.Point(135, 214);
@@ -187,6 +189,16 @@
 			this.textBox1.TabIndex = 14;
 			this.textBox1.Text = "NOTE - Existing files are never overwritten.  Files are moved.  May use \'YYYY-MM\'" +
 				" checkbox. Only processes top-level directory.";
+			// 
+			// chkSortCopy
+			// 
+			this.chkSortCopy.AutoSize = true;
+			this.chkSortCopy.Location = new System.Drawing.Point(116, 37);
+			this.chkSortCopy.Name = "chkSortCopy";
+			this.chkSortCopy.Size = new System.Drawing.Size(74, 17);
+			this.chkSortCopy.TabIndex = 15;
+			this.chkSortCopy.Text = "Copy Files";
+			this.chkSortCopy.UseVisualStyleBackColor = true;
 			// 
 			// MainForm
 			// 
@@ -231,6 +243,7 @@
 		private System.Windows.Forms.Button btnSortIndividual;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.CheckBox chkSortCopy;
     }
 }
 

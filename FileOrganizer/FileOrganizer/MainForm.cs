@@ -292,7 +292,15 @@ namespace FileOrganizer
 							di.Create();
 						}
 
-						file.MoveTo(pathWithName);
+						if (chkSortCopy.Checked)
+						{
+							file.CopyTo(pathWithName, false);
+						}
+						else
+						{ 
+							file.MoveTo(pathWithName);
+						}
+
 					}
 
 					//else
