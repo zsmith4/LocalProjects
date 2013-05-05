@@ -38,6 +38,7 @@
 			this.btnRun = new System.Windows.Forms.Button();
 			this.chkDestination = new System.Windows.Forms.CheckBox();
 			this.chkSkipExisting = new System.Windows.Forms.CheckBox();
+			this.chkAddDashesToDates = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// sourceOutput
@@ -126,11 +127,24 @@
 			this.chkSkipExisting.Text = "Skip Existing";
 			this.chkSkipExisting.UseVisualStyleBackColor = true;
 			// 
+			// chkAddDashesToDates
+			// 
+			this.chkAddDashesToDates.AutoSize = true;
+			this.chkAddDashesToDates.Checked = true;
+			this.chkAddDashesToDates.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.chkAddDashesToDates.Location = new System.Drawing.Point(434, 158);
+			this.chkAddDashesToDates.Name = "chkAddDashesToDates";
+			this.chkAddDashesToDates.Size = new System.Drawing.Size(253, 17);
+			this.chkAddDashesToDates.TabIndex = 10;
+			this.chkAddDashesToDates.Text = "Update \'yyyymmdd\' to \'yyyy-mm-dd\' in Source Dir";
+			this.chkAddDashesToDates.UseVisualStyleBackColor = true;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(713, 191);
+			this.ClientSize = new System.Drawing.Size(713, 207);
+			this.Controls.Add(this.chkAddDashesToDates);
 			this.Controls.Add(this.chkSkipExisting);
 			this.Controls.Add(this.chkDestination);
 			this.Controls.Add(this.btnRun);
@@ -159,6 +173,7 @@
         private System.Windows.Forms.Button btnRun;
 		private System.Windows.Forms.CheckBox chkDestination;
 		private System.Windows.Forms.CheckBox chkSkipExisting;
+		private System.Windows.Forms.CheckBox chkAddDashesToDates;
     }
 }
 

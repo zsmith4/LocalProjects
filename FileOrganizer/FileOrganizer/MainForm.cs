@@ -54,19 +54,22 @@ namespace FileOrganizer
 				dest.Create();
 			}
 
-			//rename all source directories
-			var allDirs = source.GetDirectories("*", SearchOption.AllDirectories);
-			foreach (var subDir in allDirs)
-			{		
-				string newName = AddDashesToDateInDirName(subDir.Name);
-				var di = new DirectoryInfo(Path.Combine(subDir.Parent.FullName, newName));
-
-				if (di.FullName != subDir.FullName)
+			//find instances of yyyymmdd and switch them to yyyy-mm-dd.  THIS UPDATES THE SOURCE DIRECTORY, NOT THE DESTINATION
+			if (chkAddDashesToDates.Checked)
+			{
+				var allDirs = source.GetDirectories("*", SearchOption.AllDirectories);
+				foreach (var subDir in allDirs)
 				{
-					subDir.MoveTo(di.FullName);
-				}
-			}
+					string newName = AddDashesToDateInDirName(subDir.Name);
+					var di = new DirectoryInfo(Path.Combine(subDir.Parent.FullName, newName));
 
+					if (di.FullName != subDir.FullName)
+					{
+						subDir.MoveTo(di.FullName);
+					}
+				}
+
+			}
 
 			//get year directories
 			var yearDirs = source.GetDirectories("*", SearchOption.TopDirectoryOnly);
@@ -74,20 +77,30 @@ namespace FileOrganizer
 			{
 				var yearInt = 0;
 				var monthInt = 0;
-				
+
 				//get year from directory name
 				var year = RegularExpressions.ParseDate(DateFunctions.RemoveSpecialChars(yearDir.Name));
-				
+
 				if (year != DateTime.MinValue)
 				{
 					yearInt = year.Year;
+				}
+				else
+				{
+					string sourcDir = Path.Combine(source.FullName, yearDir.Name);
+					string destDir = Path.Combine(dest.FullName, yearDir.Name);
+					var diSource = new DirectoryInfo(sourcDir);
+					var diDest = new DirectoryInfo(destDir);
+
+					Console.WriteLine();
+					CopyRecursive(diSource, diDest);
 				}
 
 				//get month-level directories
 				var monthDirs = yearDir.GetDirectories("*", SearchOption.TopDirectoryOnly);
 				foreach (var monthDir in monthDirs)
 				{
-					string monthDirDesc = AddDashesToDateInDirName(monthDir.Name); 
+					string monthDirDesc = AddDashesToDateInDirName(monthDir.Name);
 
 					//determine the month
 					var month = RegularExpressions.ParseDate(DateFunctions.RemoveSpecialChars(monthDirDesc));
@@ -99,7 +112,7 @@ namespace FileOrganizer
 					if (monthInt > 0)
 					{
 						//dest
-						DateTime combinedDate = new DateTime(yearInt, monthInt, 1);  //exception when a year folder doesn't have a year in it
+						DateTime combinedDate = new DateTime(yearInt, monthInt, 1);  //exception when a year folder only has text
 						string dirNewName = String.Format("{0:yyyy-MM}", combinedDate);
 						newDirName = Path.Combine(dest.FullName, yearInt.ToString());
 						newDirName = Path.Combine(newDirName, dirNewName);
@@ -121,7 +134,7 @@ namespace FileOrganizer
 						//source
 						sourceDirName = monthDir.FullName;
 						newDirName = Path.Combine(dest.FullName, yearDir.Name);
-						newDirName = Path.Combine(newDirName, monthDir.Name);					
+						newDirName = Path.Combine(newDirName, monthDir.Name);
 					}
 
 					//create directory info's
@@ -132,7 +145,7 @@ namespace FileOrganizer
 					Utilities.CopyTo(diSourceName, diDestName, chkDestination.Checked, chkSkipExisting.Checked);
 
 				}
-			}	
+			}
 
 			btnRun.Enabled = true;
 			btnRun.Text = "Go";
@@ -187,5 +200,41 @@ namespace FileOrganizer
 			Utilities.CopyTo(source, diNewName, overwrite, skip);
 
 		}
+
+		public void CopyRecursive(DirectoryInfo source, DirectoryInfo dest)
+		{
+			//create dest directory if it doesn't exist
+			if (!Directory.Exists(dest.FullName))
+			{
+				Directory.CreateDirectory(dest.FullName);
+			}
+
+			//get list of files and sort
+			var files = Sort(source.GetFiles("*.*"));
+
+			//re-iterate through files
+			foreach (FileInfo fi in files)
+			{
+				//get new file name and copy to dest
+				//var fileName = GetFileName(prefix, Counter, digits, fi.Extension, numberFirst);
+				fi.CopyTo(Path.Combine(dest.ToString(), fi.Name), true);
+			}
+
+			//recursively copy each subdirectory
+			foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+			{
+				DirectoryInfo nextTargetSubDir = dest.CreateSubdirectory(diSourceSubDir.Name);
+				CopyRecursive(diSourceSubDir, nextTargetSubDir);
+			}
+		}
+
+
+		public static List<FileInfo> Sort(FileInfo[] fileList)
+		{
+			List<FileInfo> newList = fileList.ToList();
+			newList.ToList().Sort((a, b) => String.Compare(a.Name, b.Name));
+			return newList;
+		}
+
 	}
 }
