@@ -45,8 +45,9 @@ namespace FileOrganizer
 			var source = new DirectoryInfo(txtSourceDirectory.Text);
 			var dest = new DirectoryInfo(txtOutputDirectory.Text);
 			_skip = chkSkipExisting.Checked;
-			string newDirName;
-			string sourceDirName;
+			string newDirName = string.Empty;
+			string sourceDirName = string.Empty;
+			string dirNewName = string.Empty;
 
 			//create destination if it doesn't exist
 			if (!dest.Exists)
@@ -92,7 +93,7 @@ namespace FileOrganizer
 					var diSource = new DirectoryInfo(sourcDir);
 					var diDest = new DirectoryInfo(destDir);
 
-					Console.WriteLine();
+					//copy everything to destination directory
 					CopyRecursive(diSource, diDest);
 				}
 
@@ -113,16 +114,35 @@ namespace FileOrganizer
 					{
 						//dest
 						DateTime combinedDate = new DateTime(yearInt, monthInt, 1);  //exception when a year folder only has text
-						string dirNewName = String.Format("{0:yyyy-MM}", combinedDate);
-						newDirName = Path.Combine(dest.FullName, yearInt.ToString());
-						newDirName = Path.Combine(newDirName, dirNewName);
 
-						if (monthDirDesc == monthDir.Name)
+						if (chkUseYearMonthDir.Checked)
+						{
+							dirNewName = String.Format("{0:yyyy-MM}", combinedDate);
+							newDirName = Path.Combine(dest.FullName, yearInt.ToString());
+							newDirName = Path.Combine(newDirName, dirNewName);
+							
+							if (monthDirDesc == monthDir.Name)
+							{
+								if (!CheckIfYearMonthFormatOnly(monthDir.Name))
+								{
+									newDirName = Path.Combine(newDirName, monthDirDesc);
+								}
+							}
+						}
+						else //THIS SECTION WORKS
 						{
 							if (!CheckIfYearMonthFormatOnly(monthDir.Name))
 							{
-								newDirName = Path.Combine(newDirName, monthDirDesc);
+								dirNewName = monthDir.Name;
 							}
+							else
+							{
+								dirNewName = string.Empty;
+							}
+							
+							newDirName = Path.Combine(dest.FullName, yearInt.ToString());
+							newDirName = Path.Combine(newDirName, dirNewName);
+
 						}
 
 						//source

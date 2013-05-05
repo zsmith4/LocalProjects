@@ -39,6 +39,7 @@
 			this.chkDestination = new System.Windows.Forms.CheckBox();
 			this.chkSkipExisting = new System.Windows.Forms.CheckBox();
 			this.chkAddDashesToDates = new System.Windows.Forms.CheckBox();
+			this.chkUseYearMonthDir = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// sourceOutput
@@ -139,11 +140,22 @@
 			this.chkAddDashesToDates.Text = "Update \'yyyymmdd\' to \'yyyy-mm-dd\' in Source Dir";
 			this.chkAddDashesToDates.UseVisualStyleBackColor = true;
 			// 
+			// chkUseYearMonthDir
+			// 
+			this.chkUseYearMonthDir.AutoSize = true;
+			this.chkUseYearMonthDir.Location = new System.Drawing.Point(434, 181);
+			this.chkUseYearMonthDir.Name = "chkUseYearMonthDir";
+			this.chkUseYearMonthDir.Size = new System.Drawing.Size(152, 17);
+			this.chkUseYearMonthDir.TabIndex = 11;
+			this.chkUseYearMonthDir.Text = "Use \'YYYY-MM\' Sub-folder";
+			this.chkUseYearMonthDir.UseVisualStyleBackColor = true;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(713, 207);
+			this.ClientSize = new System.Drawing.Size(713, 226);
+			this.Controls.Add(this.chkUseYearMonthDir);
 			this.Controls.Add(this.chkAddDashesToDates);
 			this.Controls.Add(this.chkSkipExisting);
 			this.Controls.Add(this.chkDestination);
@@ -174,6 +186,7 @@
 		private System.Windows.Forms.CheckBox chkDestination;
 		private System.Windows.Forms.CheckBox chkSkipExisting;
 		private System.Windows.Forms.CheckBox chkAddDashesToDates;
+		private System.Windows.Forms.CheckBox chkUseYearMonthDir;
     }
 }
 
