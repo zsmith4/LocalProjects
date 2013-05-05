@@ -42,8 +42,8 @@
 			this.chkUseYearMonthDir = new System.Windows.Forms.CheckBox();
 			this.btnSortIndividual = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.chkSortCopy = new System.Windows.Forms.CheckBox();
+			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -63,7 +63,7 @@
 			this.txtSourceDirectory.Name = "txtSourceDirectory";
 			this.txtSourceDirectory.Size = new System.Drawing.Size(419, 20);
 			this.txtSourceDirectory.TabIndex = 1;
-			this.txtSourceDirectory.Text = "C:\\Users\\Zach\\Photos\\_Testing\\Input";
+			this.txtSourceDirectory.Text = "C:\\Users\\Zach\\Documents\\Temp\\_Testing\\Input";
 			// 
 			// label1
 			// 
@@ -90,7 +90,7 @@
 			this.txtOutputDirectory.Name = "txtOutputDirectory";
 			this.txtOutputDirectory.Size = new System.Drawing.Size(419, 20);
 			this.txtOutputDirectory.TabIndex = 4;
-			this.txtOutputDirectory.Text = "C:\\Users\\Zach\\Photos\\_Testing\\Output";
+			this.txtOutputDirectory.Text = "C:\\Users\\Zach\\Documents\\Temp\\_Testing\\Output";
 			// 
 			// label2
 			// 
@@ -179,6 +179,16 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Individual File Sorting by Date";
 			// 
+			// chkSortCopy
+			// 
+			this.chkSortCopy.AutoSize = true;
+			this.chkSortCopy.Location = new System.Drawing.Point(116, 37);
+			this.chkSortCopy.Name = "chkSortCopy";
+			this.chkSortCopy.Size = new System.Drawing.Size(74, 17);
+			this.chkSortCopy.TabIndex = 15;
+			this.chkSortCopy.Text = "Copy Files";
+			this.chkSortCopy.UseVisualStyleBackColor = true;
+			// 
 			// textBox1
 			// 
 			this.textBox1.BackColor = System.Drawing.Color.White;
@@ -189,16 +199,6 @@
 			this.textBox1.TabIndex = 14;
 			this.textBox1.Text = "NOTE - Existing files are never overwritten.  Files are moved.  May use \'YYYY-MM\'" +
 				" checkbox. Only processes top-level directory.";
-			// 
-			// chkSortCopy
-			// 
-			this.chkSortCopy.AutoSize = true;
-			this.chkSortCopy.Location = new System.Drawing.Point(116, 37);
-			this.chkSortCopy.Name = "chkSortCopy";
-			this.chkSortCopy.Size = new System.Drawing.Size(74, 17);
-			this.chkSortCopy.TabIndex = 15;
-			this.chkSortCopy.Text = "Copy Files";
-			this.chkSortCopy.UseVisualStyleBackColor = true;
 			// 
 			// MainForm
 			// 
