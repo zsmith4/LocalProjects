@@ -99,9 +99,10 @@ namespace FileOrganizer
             return dateTaken;
         }
 
-        internal static string ParseDescFromDirName(string dirName)
+        internal static string RemoveDateFromDirName(string dirName, int expectedDateDigits)
         {
-            var dirDesc = dirName.Substring(9, dirName.Length - 9);
+			int lengthToRemove = expectedDateDigits + 1;
+			var dirDesc = dirName.Substring(lengthToRemove, dirName.Length - lengthToRemove);
             return dirDesc;
         }
 

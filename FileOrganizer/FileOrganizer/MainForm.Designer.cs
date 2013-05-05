@@ -37,6 +37,7 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.btnRun = new System.Windows.Forms.Button();
 			this.chkDestination = new System.Windows.Forms.CheckBox();
+			this.chkSkipExisting = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// sourceOutput
@@ -113,11 +114,24 @@
 			this.chkDestination.Text = "Overwrite Destination";
 			this.chkDestination.UseVisualStyleBackColor = true;
 			// 
+			// chkSkipExisting
+			// 
+			this.chkSkipExisting.AutoSize = true;
+			this.chkSkipExisting.Checked = true;
+			this.chkSkipExisting.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.chkSkipExisting.Location = new System.Drawing.Point(434, 134);
+			this.chkSkipExisting.Name = "chkSkipExisting";
+			this.chkSkipExisting.Size = new System.Drawing.Size(86, 17);
+			this.chkSkipExisting.TabIndex = 9;
+			this.chkSkipExisting.Text = "Skip Existing";
+			this.chkSkipExisting.UseVisualStyleBackColor = true;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(713, 160);
+			this.ClientSize = new System.Drawing.Size(713, 191);
+			this.Controls.Add(this.chkSkipExisting);
 			this.Controls.Add(this.chkDestination);
 			this.Controls.Add(this.btnRun);
 			this.Controls.Add(this.label2);
@@ -144,6 +158,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnRun;
 		private System.Windows.Forms.CheckBox chkDestination;
+		private System.Windows.Forms.CheckBox chkSkipExisting;
     }
 }
 

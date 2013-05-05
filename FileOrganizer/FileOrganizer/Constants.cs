@@ -7,6 +7,8 @@ namespace FileOrganizer
 {
 	public static class Constants
 	{
+		//public static enum OverwriteType {Skip, Overwrite, Rename};
+
         public static List<Month> GetMonths()
 		{
 		    var months = new List<Month>();

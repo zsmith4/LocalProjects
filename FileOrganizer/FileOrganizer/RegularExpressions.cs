@@ -13,14 +13,21 @@ namespace FileOrganizer
         static RegularExpressions()
         {
             var regExDict = new Dictionary<string, string>();
-            //YY(YY)-M(M)
-            regExDict.Add(@".*\b(?<year>\d{2,4})-(?<month>\d{1,2})\b.*", "${month}/${year}");
-
-            //YYYYMMDD
-            regExDict.Add(@".*\b(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}");
+			
+			//YYYYMMDD =  = MM/DD/YYYY
+			regExDict.Add(@"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}");
             
-            //YY(YY)M(M)D(D)
-            regExDict.Add(@".*\b(?<year>\d{2,4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+            //YYYYMM = MM/DD/YYYY
+            regExDict.Add(@"(?<year>\d{4})(?<month>\d{2})\b.*", "${month}/1/${year}");
+
+			////YYYY
+			regExDict.Add(@"(?<year>\d{4})\b.*", "01/01/${year}");
+
+			////YY(YY)M(M)D(D)
+			////regExDict.Add(@".*\b(?<year>\d{4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+			////regExDict.Add(@".*\b(?<year>\d{2,4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+			////YYYYMM
+			//regExDict.Add(@"(?<year>\d{4})(?<month>\d{2})\b.*", "${month}/${year}");
 
             RegExDict = regExDict;
         }
@@ -33,7 +40,10 @@ namespace FileOrganizer
             {
                 if (Regex.IsMatch(input, kvp.Key))
                 {
-                    DateTime.TryParse(Regex.Replace(input, kvp.Key, kvp.Value), out date);
+                    var temp = Regex.Replace(input, kvp.Key, kvp.Value);
+					
+					DateTime.TryParse(Regex.Replace(input, kvp.Key, kvp.Value), out date);
+
 					break;
                 }
             }
@@ -43,8 +53,45 @@ namespace FileOrganizer
 				date = FindStringMonthWithDigitYear(input);
 			}
 
-        	return date;
+			Console.WriteLine();
+			return date;
         }
+
+		public static string AddDashesToDateInDirName(string dirName)
+		{
+			//define pattern and replacement
+			string pattern = @"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<remain>\b.*)";
+			string replacement = "${year}-${month}-${day}${remain}";
+
+			//perform replacement
+			Regex regEx = new Regex(pattern);
+			string result = regEx.Replace(dirName, replacement);
+
+			if (!String.IsNullOrEmpty(result))
+			{
+				return result;
+			}
+
+			return dirName;
+		}
+
+		public static string GetDescWithoutDate(string dirName)
+		{
+			//define pattern and replacement
+			string pattern = @"(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?<remain>\b.*)";
+			string replacement = "${remain}";
+
+			//perform replacement
+			Regex regEx = new Regex(pattern);
+			string result = regEx.Replace(dirName, replacement);
+
+			if (!String.IsNullOrEmpty(result))
+			{
+				return result;
+			}
+
+			return dirName;
+		}
 
         public static DateTime FindStringMonthWithDigitYear(string input)
         {
