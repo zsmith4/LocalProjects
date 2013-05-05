@@ -40,6 +40,7 @@
 			this.chkSkipExisting = new System.Windows.Forms.CheckBox();
 			this.chkAddDashesToDates = new System.Windows.Forms.CheckBox();
 			this.chkUseYearMonthDir = new System.Windows.Forms.CheckBox();
+			this.btnSortIndividual = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// sourceOutput
@@ -143,6 +144,8 @@
 			// chkUseYearMonthDir
 			// 
 			this.chkUseYearMonthDir.AutoSize = true;
+			this.chkUseYearMonthDir.Checked = true;
+			this.chkUseYearMonthDir.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.chkUseYearMonthDir.Location = new System.Drawing.Point(434, 181);
 			this.chkUseYearMonthDir.Name = "chkUseYearMonthDir";
 			this.chkUseYearMonthDir.Size = new System.Drawing.Size(152, 17);
@@ -150,11 +153,22 @@
 			this.chkUseYearMonthDir.Text = "Use \'YYYY-MM\' Sub-folder";
 			this.chkUseYearMonthDir.UseVisualStyleBackColor = true;
 			// 
+			// btnSortIndividual
+			// 
+			this.btnSortIndividual.Location = new System.Drawing.Point(142, 196);
+			this.btnSortIndividual.Name = "btnSortIndividual";
+			this.btnSortIndividual.Size = new System.Drawing.Size(88, 23);
+			this.btnSortIndividual.TabIndex = 13;
+			this.btnSortIndividual.Text = "Sort Individual";
+			this.btnSortIndividual.UseVisualStyleBackColor = true;
+			this.btnSortIndividual.Click += new System.EventHandler(this.btnSortIndividual_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(713, 226);
+			this.ClientSize = new System.Drawing.Size(713, 256);
+			this.Controls.Add(this.btnSortIndividual);
 			this.Controls.Add(this.chkUseYearMonthDir);
 			this.Controls.Add(this.chkAddDashesToDates);
 			this.Controls.Add(this.chkSkipExisting);
@@ -187,6 +201,7 @@
 		private System.Windows.Forms.CheckBox chkSkipExisting;
 		private System.Windows.Forms.CheckBox chkAddDashesToDates;
 		private System.Windows.Forms.CheckBox chkUseYearMonthDir;
+		private System.Windows.Forms.Button btnSortIndividual;
     }
 }
 
