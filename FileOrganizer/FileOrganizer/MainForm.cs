@@ -45,14 +45,14 @@ namespace FileOrganizer
 			var source = new DirectoryInfo(txtSourceDirectory.Text);
 			var dest = new DirectoryInfo(txtOutputDirectory.Text);
 			_skip = chkSkipExisting.Checked;
+			string newDirName;
+			string sourceDirName;
 
 			//create destination if it doesn't exist
 			if (!dest.Exists)
 			{
 				dest.Create();
 			}
-
-			//******
 
 			//rename all source directories
 			var allDirs = source.GetDirectories("*", SearchOption.AllDirectories);
@@ -72,7 +72,7 @@ namespace FileOrganizer
 			var yearDirs = source.GetDirectories("*", SearchOption.TopDirectoryOnly);
 			foreach (var yearDir in yearDirs)
 			{
-				var yearInt = 1901;
+				var yearInt = 0;
 				var monthInt = 0;
 				
 				//get year from directory name
@@ -96,23 +96,33 @@ namespace FileOrganizer
 						monthInt = month.Month;
 					}
 
-					//dest
-					DateTime combinedDate = new DateTime(yearInt,monthInt,1);
-					string dirNewName = String.Format("{0:yyyy-MM}", combinedDate);
-					string newDirName = Path.Combine(dest.FullName, yearInt.ToString());
-					newDirName = Path.Combine(newDirName, dirNewName);
-
-					if (monthDirDesc == monthDir.Name)
+					if (monthInt > 0)
 					{
-						if (!CheckIfYearMonthFormatOnly(monthDir.Name))
-						{
-							newDirName = Path.Combine(newDirName, monthDirDesc);
-						}
-					}
+						//dest
+						DateTime combinedDate = new DateTime(yearInt, monthInt, 1);  //exception when a year folder doesn't have a year in it
+						string dirNewName = String.Format("{0:yyyy-MM}", combinedDate);
+						newDirName = Path.Combine(dest.FullName, yearInt.ToString());
+						newDirName = Path.Combine(newDirName, dirNewName);
 
-					//source
-					string sourceDirName = Path.Combine(source.FullName, yearDir.Name);
-					sourceDirName = Path.Combine(sourceDirName, monthDir.Name);
+						if (monthDirDesc == monthDir.Name)
+						{
+							if (!CheckIfYearMonthFormatOnly(monthDir.Name))
+							{
+								newDirName = Path.Combine(newDirName, monthDirDesc);
+							}
+						}
+
+						//source
+						sourceDirName = Path.Combine(source.FullName, yearDir.Name);
+						sourceDirName = Path.Combine(sourceDirName, monthDir.Name);
+					}
+					else
+					{
+						//source
+						sourceDirName = monthDir.FullName;
+						newDirName = Path.Combine(dest.FullName, yearDir.Name);
+						newDirName = Path.Combine(newDirName, monthDir.Name);					
+					}
 
 					//create directory info's
 					var diDestName = new DirectoryInfo(newDirName);
@@ -122,11 +132,7 @@ namespace FileOrganizer
 					Utilities.CopyTo(diSourceName, diDestName, chkDestination.Checked, chkSkipExisting.Checked);
 
 				}
-			}
-
-
-			//******
-						
+			}	
 
 			btnRun.Enabled = true;
 			btnRun.Text = "Go";
