@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace CopyRename
+namespace FileOrganizer
 {
 	public static class Constants
 	{
+		//public static enum OverwriteType {Skip, Overwrite, Rename};
+
         public static List<Month> GetMonths()
 		{
 		    var months = new List<Month>();
 
-            //Unknown
+        	//Unknown
             var month = new Month { MonthInt = 0, FullName = "Unknown", Abbreviation = "Unknown", TwoDigitFormat = "99" };
             months.Add(month);
 

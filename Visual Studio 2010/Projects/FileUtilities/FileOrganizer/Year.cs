@@ -1,4 +1,4 @@
-﻿namespace CopyRename
+﻿namespace FileOrganizer
 {
     public class Year
     {

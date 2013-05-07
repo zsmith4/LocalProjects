@@ -60,14 +60,29 @@
 			this.radioPortrait = new System.Windows.Forms.RadioButton();
 			this.radioLandscape = new System.Windows.Forms.RadioButton();
 			this.tabContainer = new System.Windows.Forms.TabControl();
-			this.tabCopy = new System.Windows.Forms.TabPage();
+			this.tabRename = new System.Windows.Forms.TabPage();
+			this.tabOrganize = new System.Windows.Forms.TabPage();
+			this.tabSort = new System.Windows.Forms.TabPage();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.chkUseYearMonthDir = new System.Windows.Forms.CheckBox();
+			this.chkSortCopy = new System.Windows.Forms.CheckBox();
+			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.tabResize = new System.Windows.Forms.TabPage();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.checkBox1 = new System.Windows.Forms.CheckBox();
+			this.chkAddDashesToDates = new System.Windows.Forms.CheckBox();
+			this.chkSkipExisting = new System.Windows.Forms.CheckBox();
+			this.chkDestination = new System.Windows.Forms.CheckBox();
 			this.grpCopy.SuspendLayout();
 			this.statusStrip1.SuspendLayout();
 			this.grpConstraint.SuspendLayout();
 			this.tabContainer.SuspendLayout();
-			this.tabCopy.SuspendLayout();
+			this.tabRename.SuspendLayout();
+			this.tabOrganize.SuspendLayout();
+			this.tabSort.SuspendLayout();
+			this.groupBox1.SuspendLayout();
 			this.tabResize.SuspendLayout();
+			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// btnSourceBrowse
@@ -375,7 +390,9 @@
 			// 
 			// tabContainer
 			// 
-			this.tabContainer.Controls.Add(this.tabCopy);
+			this.tabContainer.Controls.Add(this.tabRename);
+			this.tabContainer.Controls.Add(this.tabOrganize);
+			this.tabContainer.Controls.Add(this.tabSort);
 			this.tabContainer.Controls.Add(this.tabResize);
 			this.tabContainer.Location = new System.Drawing.Point(142, 100);
 			this.tabContainer.Name = "tabContainer";
@@ -384,17 +401,82 @@
 			this.tabContainer.TabIndex = 4;
 			this.tabContainer.SelectedIndexChanged += new System.EventHandler(this.tabContainer_SelectedIndexChanged);
 			// 
-			// tabCopy
+			// tabRename
 			// 
-			this.tabCopy.BackColor = System.Drawing.SystemColors.Control;
-			this.tabCopy.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			this.tabCopy.Controls.Add(this.grpCopy);
-			this.tabCopy.Location = new System.Drawing.Point(4, 22);
-			this.tabCopy.Name = "tabCopy";
-			this.tabCopy.Padding = new System.Windows.Forms.Padding(3);
-			this.tabCopy.Size = new System.Drawing.Size(411, 154);
-			this.tabCopy.TabIndex = 0;
-			this.tabCopy.Text = "Copy";
+			this.tabRename.BackColor = System.Drawing.SystemColors.Control;
+			this.tabRename.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.tabRename.Controls.Add(this.grpCopy);
+			this.tabRename.Location = new System.Drawing.Point(4, 22);
+			this.tabRename.Name = "tabRename";
+			this.tabRename.Padding = new System.Windows.Forms.Padding(3);
+			this.tabRename.Size = new System.Drawing.Size(411, 154);
+			this.tabRename.TabIndex = 0;
+			this.tabRename.Text = "Rename";
+			// 
+			// tabOrganize
+			// 
+			this.tabOrganize.BackColor = System.Drawing.SystemColors.ButtonFace;
+			this.tabOrganize.CausesValidation = false;
+			this.tabOrganize.Controls.Add(this.groupBox2);
+			this.tabOrganize.Location = new System.Drawing.Point(4, 22);
+			this.tabOrganize.Name = "tabOrganize";
+			this.tabOrganize.Size = new System.Drawing.Size(411, 154);
+			this.tabOrganize.TabIndex = 2;
+			this.tabOrganize.Text = "Organize";
+			// 
+			// tabSort
+			// 
+			this.tabSort.BackColor = System.Drawing.SystemColors.ButtonFace;
+			this.tabSort.Controls.Add(this.groupBox1);
+			this.tabSort.Location = new System.Drawing.Point(4, 22);
+			this.tabSort.Name = "tabSort";
+			this.tabSort.Size = new System.Drawing.Size(411, 154);
+			this.tabSort.TabIndex = 3;
+			this.tabSort.Text = "Sort";
+			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.chkUseYearMonthDir);
+			this.groupBox1.Controls.Add(this.chkSortCopy);
+			this.groupBox1.Controls.Add(this.textBox1);
+			this.groupBox1.Location = new System.Drawing.Point(3, 14);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(405, 137);
+			this.groupBox1.TabIndex = 18;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Sort Files Into Directories";
+			// 
+			// chkUseYearMonthDir
+			// 
+			this.chkUseYearMonthDir.AutoSize = true;
+			this.chkUseYearMonthDir.Location = new System.Drawing.Point(4, -15);
+			this.chkUseYearMonthDir.Name = "chkUseYearMonthDir";
+			this.chkUseYearMonthDir.Size = new System.Drawing.Size(152, 17);
+			this.chkUseYearMonthDir.TabIndex = 20;
+			this.chkUseYearMonthDir.Text = "Use \'YYYY-MM\' Sub-folder";
+			this.chkUseYearMonthDir.UseVisualStyleBackColor = true;
+			// 
+			// chkSortCopy
+			// 
+			this.chkSortCopy.AutoSize = true;
+			this.chkSortCopy.Location = new System.Drawing.Point(19, 31);
+			this.chkSortCopy.Name = "chkSortCopy";
+			this.chkSortCopy.Size = new System.Drawing.Size(74, 17);
+			this.chkSortCopy.TabIndex = 19;
+			this.chkSortCopy.Text = "Copy Files";
+			this.chkSortCopy.UseVisualStyleBackColor = true;
+			// 
+			// textBox1
+			// 
+			this.textBox1.BackColor = System.Drawing.SystemColors.ButtonFace;
+			this.textBox1.Location = new System.Drawing.Point(19, 65);
+			this.textBox1.Multiline = true;
+			this.textBox1.Name = "textBox1";
+			this.textBox1.Size = new System.Drawing.Size(366, 69);
+			this.textBox1.TabIndex = 18;
+			this.textBox1.TabStop = false;
+			this.textBox1.Text = "NOTE - Existing files are never overwritten.  Files are moved unless specified.  " +
+				"May use \'YYYY-MM\' checkbox. Only processes top-level directory.";
 			// 
 			// tabResize
 			// 
@@ -408,6 +490,63 @@
 			this.tabResize.Size = new System.Drawing.Size(411, 154);
 			this.tabResize.TabIndex = 1;
 			this.tabResize.Text = "Resize";
+			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.checkBox1);
+			this.groupBox2.Controls.Add(this.chkAddDashesToDates);
+			this.groupBox2.Controls.Add(this.chkSkipExisting);
+			this.groupBox2.Controls.Add(this.chkDestination);
+			this.groupBox2.Location = new System.Drawing.Point(3, 14);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(405, 137);
+			this.groupBox2.TabIndex = 10;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Organize Files";
+			// 
+			// checkBox1
+			// 
+			this.checkBox1.AutoSize = true;
+			this.checkBox1.Location = new System.Drawing.Point(23, 98);
+			this.checkBox1.Name = "checkBox1";
+			this.checkBox1.Size = new System.Drawing.Size(152, 17);
+			this.checkBox1.TabIndex = 13;
+			this.checkBox1.Text = "Use \'YYYY-MM\' Sub-folder";
+			this.checkBox1.UseVisualStyleBackColor = true;
+			// 
+			// chkAddDashesToDates
+			// 
+			this.chkAddDashesToDates.AutoSize = true;
+			this.chkAddDashesToDates.Checked = true;
+			this.chkAddDashesToDates.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.chkAddDashesToDates.Location = new System.Drawing.Point(23, 75);
+			this.chkAddDashesToDates.Name = "chkAddDashesToDates";
+			this.chkAddDashesToDates.Size = new System.Drawing.Size(253, 17);
+			this.chkAddDashesToDates.TabIndex = 12;
+			this.chkAddDashesToDates.Text = "Update \'yyyymmdd\' to \'yyyy-mm-dd\' in Source Dir";
+			this.chkAddDashesToDates.UseVisualStyleBackColor = true;
+			// 
+			// chkSkipExisting
+			// 
+			this.chkSkipExisting.AutoSize = true;
+			this.chkSkipExisting.Checked = true;
+			this.chkSkipExisting.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.chkSkipExisting.Location = new System.Drawing.Point(23, 51);
+			this.chkSkipExisting.Name = "chkSkipExisting";
+			this.chkSkipExisting.Size = new System.Drawing.Size(86, 17);
+			this.chkSkipExisting.TabIndex = 11;
+			this.chkSkipExisting.Text = "Skip Existing";
+			this.chkSkipExisting.UseVisualStyleBackColor = true;
+			// 
+			// chkDestination
+			// 
+			this.chkDestination.AutoSize = true;
+			this.chkDestination.Location = new System.Drawing.Point(23, 28);
+			this.chkDestination.Name = "chkDestination";
+			this.chkDestination.Size = new System.Drawing.Size(127, 17);
+			this.chkDestination.TabIndex = 10;
+			this.chkDestination.Text = "Overwrite Destination";
+			this.chkDestination.UseVisualStyleBackColor = true;
 			// 
 			// MainForm
 			// 
@@ -434,8 +573,14 @@
 			this.grpConstraint.ResumeLayout(false);
 			this.grpConstraint.PerformLayout();
 			this.tabContainer.ResumeLayout(false);
-			this.tabCopy.ResumeLayout(false);
+			this.tabRename.ResumeLayout(false);
+			this.tabOrganize.ResumeLayout(false);
+			this.tabSort.ResumeLayout(false);
+			this.groupBox1.ResumeLayout(false);
+			this.groupBox1.PerformLayout();
 			this.tabResize.ResumeLayout(false);
+			this.groupBox2.ResumeLayout(false);
+			this.groupBox2.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -473,10 +618,21 @@
 		private System.Windows.Forms.RadioButton radioLandscape;
 		private System.Windows.Forms.RadioButton radioRatio;
 		protected internal System.Windows.Forms.TabControl tabContainer;
-		private System.Windows.Forms.TabPage tabCopy;
+		private System.Windows.Forms.TabPage tabRename;
 		private System.Windows.Forms.TabPage tabResize;
 		private System.Windows.Forms.TextBox txtLandscape;
 		private System.Windows.Forms.TextBox txtPortrait;
+		private System.Windows.Forms.TabPage tabOrganize;
+		private System.Windows.Forms.TabPage tabSort;
+		private System.Windows.Forms.GroupBox groupBox1;
+		private System.Windows.Forms.CheckBox chkUseYearMonthDir;
+		private System.Windows.Forms.CheckBox chkSortCopy;
+		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.GroupBox groupBox2;
+		private System.Windows.Forms.CheckBox checkBox1;
+		private System.Windows.Forms.CheckBox chkAddDashesToDates;
+		private System.Windows.Forms.CheckBox chkSkipExisting;
+		private System.Windows.Forms.CheckBox chkDestination;
     }
 }
 

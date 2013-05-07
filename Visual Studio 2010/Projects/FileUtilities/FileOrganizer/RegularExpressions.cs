@@ -2,21 +2,30 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace CopyRename
+namespace FileOrganizer
 {
     public static class RegularExpressions
     {
         static RegularExpressions()
         {
-            var regExDict = new Dictionary<string, string>();
-            //YY(YY)-M(M)
-            regExDict.Add(@".*\b(?<year>\d{2,4})-(?<month>\d{1,2})\b.*", "${month}/${year}");
+            var regExDict = new Dictionary<string, string>
+                            {
+                            	{@"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}"},
+                            	{@"(?<year>\d{4})(?<month>\d{2})\b.*", "${month}/1/${year}"},
+                            	{@"(?<year>\d{4})\b.*", "01/01/${year}"}
+                            };
+			
+			//YYYYMMDD =  = MM/DD/YYYY
 
-            //YYYYMMDD
-            regExDict.Add(@".*\b(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}");
-            
-            //YY(YY)M(M)D(D)
-            regExDict.Add(@".*\b(?<year>\d{2,4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+        	//YYYYMM = MM/DD/YYYY
+
+        	////YYYY
+
+        	////YY(YY)M(M)D(D)
+			////regExDict.Add(@".*\b(?<year>\d{4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+			////regExDict.Add(@".*\b(?<year>\d{2,4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+			////YYYYMM
+			//regExDict.Add(@"(?<year>\d{4})(?<month>\d{2})\b.*", "${month}/${year}");
 
             RegExDict = regExDict;
         }
@@ -29,7 +38,7 @@ namespace CopyRename
             {
                 if (Regex.IsMatch(input, kvp.Key))
                 {
-                    //var temp = Regex.Replace(input, kvp.Key, kvp.Value);
+                    var temp = Regex.Replace(input, kvp.Key, kvp.Value);
 					
 					DateTime.TryParse(Regex.Replace(input, kvp.Key, kvp.Value), out date);
 
@@ -42,7 +51,8 @@ namespace CopyRename
 				date = FindStringMonthWithDigitYear(input);
 			}
 
-        	return date;
+			Console.WriteLine();
+			return date;
         }
 
 		public static string AddDashesToDateInDirName(string dirName)

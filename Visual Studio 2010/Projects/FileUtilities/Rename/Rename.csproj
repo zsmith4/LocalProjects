@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{93C1FC50-8D6F-42D5-B156-4ADFCFD580B8}</ProjectGuid>
+    <ProjectGuid>{EB7E5898-2796-42E9-A4E9-5CF9528A9D51}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CopyRename</RootNamespace>
