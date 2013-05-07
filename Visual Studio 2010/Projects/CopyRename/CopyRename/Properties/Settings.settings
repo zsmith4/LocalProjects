@@ -1,0 +1,48 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CopyRename.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SourceDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Users\zsmith\Documents\Photos\Album\Scanned Photos and Albums</Value>
+    </Setting>
+    <Setting Name="DestDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Users\zsmith\Documents\Photos\Album\Scanned Photos and Albums Output</Value>
+    </Setting>
+    <Setting Name="Prefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Image</Value>
+    </Setting>
+    <Setting Name="Digits" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="SimpleCopy" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="UseDirName" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="StartNumber" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="DigitsSelectedIndex" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="Ext" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">.jpg</Value>
+    </Setting>
+    <Setting Name="NumberFirst" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ConstraintTypeSelection" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Landscape</Value>
+    </Setting>
+    <Setting Name="ConstraintLandscape" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ConstraintPortrait" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ConstraintRatio" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>
