@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace FileOrganizer
 {
@@ -57,8 +53,8 @@ namespace FileOrganizer
 		{ 
 			string extension = fileInfo.Extension;
 			string name = fileInfo.Name;
-			name = name.Remove(name.LastIndexOf("."));
-			name = name + "_Duplicate_" + String.Format("{0:yyyy.dd.MM.H.mm.ss.ffffff}", System.DateTime.Now);
+			name = name.Remove(name.LastIndexOf(".", StringComparison.Ordinal));
+			name = name + "_Duplicate_" + String.Format("{0:yyyy.dd.MM.H.mm.ss.ffffff}", DateTime.Now);
 			name = name + extension;
 			return name;
 		}

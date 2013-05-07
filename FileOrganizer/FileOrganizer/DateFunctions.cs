@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace FileOrganizer
 {
@@ -25,7 +23,7 @@ namespace FileOrganizer
         {
             //Detect if dir only had month and year in odd format
             string dirNewName;
-			string monthDir = dirDate.Year + "-" + dirDate.Month.ToString().PadLeft(2, '0');
+			string monthDir = dirDate.Year + "-" + dirDate.Month.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0');
 
 			if (DirectoryDescOnlyContainsDate(dirDesc))
 			{
@@ -48,21 +46,22 @@ namespace FileOrganizer
             return dirNewName;
         }
 
-        private static bool DirectoryDescOnlyContainsDate(string dirDesc)
-        {
+		private static bool DirectoryDescOnlyContainsDate(string dirDesc)
+		{
 
-            //strip year and month out
-            string remain;
-            int year = FindYear(dirDesc, out remain);
-            int month = FindMonth(remain, out remain);
+			//strip year and month out
+			//although year and month are not used, calling FindYear and FindMonth is only for the purpose of determining if 'remain' contains anything
+			string remain;
+			var year = FindYear(dirDesc, out remain);
+			var month = FindMonth(remain, out remain);
 
-            if(String.IsNullOrEmpty(remain))
-            {
-                return true;
-            }
+			if (String.IsNullOrEmpty(remain))
+			{
+				return true;
+			}
 
-            return false;
-        }
+			return false;
+		}
 
 		public static string RemoveSpecialChars(string input)
         {
@@ -114,11 +113,9 @@ namespace FileOrganizer
 
         internal static bool RemoveIfContains(string input, string value, out string remains)
         {
-            input.ToLowerInvariant();
-            value.ToLowerInvariant();
-            if (input.Contains(value))
+			if (input.ToLowerInvariant().Contains(value.ToLowerInvariant()))
             {
-                remains = input.Replace(value, string.Empty).Trim();
+				remains = input.ToLowerInvariant().Replace(value.ToLowerInvariant(), string.Empty).Trim();
                 return true;
             }
 
@@ -158,7 +155,7 @@ namespace FileOrganizer
             foreach (var yr in mYears)
             {
                 //check for full date
-                if (RemoveIfContains(input, yr.YearInt.ToString(), out remains))
+                if (RemoveIfContains(input, yr.YearInt.ToString(CultureInfo.InvariantCulture), out remains))
                 {
                     return yr.YearInt;
                 }

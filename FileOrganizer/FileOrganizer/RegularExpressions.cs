@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace FileOrganizer
@@ -12,18 +8,20 @@ namespace FileOrganizer
     {
         static RegularExpressions()
         {
-            var regExDict = new Dictionary<string, string>();
+            var regExDict = new Dictionary<string, string>
+                            {
+                            	{@"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}"},
+                            	{@"(?<year>\d{4})(?<month>\d{2})\b.*", "${month}/1/${year}"},
+                            	{@"(?<year>\d{4})\b.*", "01/01/${year}"}
+                            };
 			
 			//YYYYMMDD =  = MM/DD/YYYY
-			regExDict.Add(@"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}");
-            
-            //YYYYMM = MM/DD/YYYY
-            regExDict.Add(@"(?<year>\d{4})(?<month>\d{2})\b.*", "${month}/1/${year}");
 
-			////YYYY
-			regExDict.Add(@"(?<year>\d{4})\b.*", "01/01/${year}");
+        	//YYYYMM = MM/DD/YYYY
 
-			////YY(YY)M(M)D(D)
+        	////YYYY
+
+        	////YY(YY)M(M)D(D)
 			////regExDict.Add(@".*\b(?<year>\d{4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
 			////regExDict.Add(@".*\b(?<year>\d{2,4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
 			////YYYYMM
@@ -60,11 +58,11 @@ namespace FileOrganizer
 		public static string AddDashesToDateInDirName(string dirName)
 		{
 			//define pattern and replacement
-			string pattern = @"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<remain>\b.*)";
-			string replacement = "${year}-${month}-${day}${remain}";
+			const string pattern = @"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<remain>\b.*)";
+			const string replacement = "${year}-${month}-${day}${remain}";
 
 			//perform replacement
-			Regex regEx = new Regex(pattern);
+			var regEx = new Regex(pattern);
 			string result = regEx.Replace(dirName, replacement);
 
 			if (!String.IsNullOrEmpty(result))
@@ -78,11 +76,11 @@ namespace FileOrganizer
 		public static string GetDescWithoutDate(string dirName)
 		{
 			//define pattern and replacement
-			string pattern = @"(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?<remain>\b.*)";
-			string replacement = "${remain}";
+			const string pattern = @"(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?<remain>\b.*)";
+			const string replacement = "${remain}";
 
 			//perform replacement
-			Regex regEx = new Regex(pattern);
+			var regEx = new Regex(pattern);
 			string result = regEx.Replace(dirName, replacement);
 
 			if (!String.IsNullOrEmpty(result))
@@ -97,7 +95,7 @@ namespace FileOrganizer
         {
             int moNum = 0;
         	DateTime date;
-            foreach(Month month in Constants.GetMonths())
+            foreach(var month in Constants.GetMonths())
             {
                 if(input.Contains(month.FullName) || input.Contains(month.Abbreviation))
                 {

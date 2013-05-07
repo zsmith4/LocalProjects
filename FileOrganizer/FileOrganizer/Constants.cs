@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Globalization;
 
 namespace FileOrganizer
 {
@@ -12,10 +11,9 @@ namespace FileOrganizer
         public static List<Month> GetMonths()
 		{
 		    var months = new List<Month>();
-		    Month month;
 
-            //Unknown
-            month = new Month { MonthInt = 0, FullName = "Unknown", Abbreviation = "Unknown", TwoDigitFormat = "99" };
+        	//Unknown
+            var month = new Month { MonthInt = 0, FullName = "Unknown", Abbreviation = "Unknown", TwoDigitFormat = "99" };
             months.Add(month);
 
             //January
@@ -77,7 +75,7 @@ namespace FileOrganizer
 
             for (var i = start; i < end; i++)
             {
-                var year = new Year {YearInt = i, TwoDigitFormat = i.ToString().Remove(0, 2)};
+                var year = new Year {YearInt = i, TwoDigitFormat = i.ToString(CultureInfo.InvariantCulture).Remove(0, 2)};
                 years.Add(year);
             }
 
