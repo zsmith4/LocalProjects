@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FileOrganizer.Properties {
+namespace FileUtilities.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -74,12 +74,12 @@ namespace FileOrganizer.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool UpdateFormatInSource {
+        public bool AddDashesToDates {
             get {
-                return ((bool)(this["UpdateFormatInSource"]));
+                return ((bool)(this["AddDashesToDates"]));
             }
             set {
-                this["UpdateFormatInSource"] = value;
+                this["AddDashesToDates"] = value;
             }
         }
         

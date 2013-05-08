@@ -10,7 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 
-namespace CopyRename
+namespace FileUtilities
 {
 	public partial class MainForm : Form
 	{
@@ -36,7 +36,7 @@ namespace CopyRename
 			FilesProcessed = 0;
 
 			//count total files
-			TotalFiles = new DirectoryInfo(Settings.SourceDir).GetFiles("*.*", SearchOption.AllDirectories).Count();
+			TotalFiles = new DirectoryInfo(Settings.Source).GetFiles("*.*", SearchOption.AllDirectories).Count();
 			statusProgress.Step = 1;
 			statusProgress.Maximum = TotalFiles;
 			statusProgress.Minimum = 0;
@@ -161,7 +161,7 @@ namespace CopyRename
 				exPrefix = "<directory name>";
 			}
 			
-			txtExample.Text = GetFileName(exPrefix, Settings.StartNumber, Convert.ToInt16(cboDigits.SelectedItem), Settings.Ext, chkNumberFirst.Checked);
+			txtExample.Text = GetFileName(exPrefix, Settings.StartNumber, Convert.ToInt16(cboDigits.SelectedItem), Settings.PhotoExtension, chkNumberFirst.Checked);
 		}
 		#endregion
 
@@ -178,8 +178,8 @@ namespace CopyRename
 		{	
 			Settings = Properties.Settings.Default;
 
-			txtSourceDirectory.Text = Settings.SourceDir;
-			txtOutputDirectory.Text = Settings.DestDir;
+			txtSourceDirectory.Text = Settings.Source;
+			txtOutputDirectory.Text = FileUtilities.Properties.Settings.Destination;
 			txtPrefix.Text = Settings.Prefix;
 
 			cboDigits.SelectedIndex = Settings.DigitsSelectedIndex;
@@ -226,14 +226,14 @@ namespace CopyRename
 		
 		private void txtSourceDirectory_TextChanged(object sender, EventArgs e)
 		{
-			Settings.SourceDir = txtSourceDirectory.Text;
+			Settings.Source = txtSourceDirectory.Text;
 			Settings.Save();
 
 		}
 
 		private void txtOutputDirectory_TextChanged(object sender, EventArgs e)
 		{
-			Settings.DestDir = txtOutputDirectory.Text;
+			Settings.Destination = txtOutputDirectory.Text;
 			Settings.Save();
 
 		}
@@ -318,7 +318,7 @@ namespace CopyRename
 
 					//only rename files that match the extension, but copy all files.  Be sure to compare lower-case to lower-case or copy will not happen
 					string fileName;
-					if (fi.Extension.ToLowerInvariant() == Settings.Ext.ToLowerInvariant())
+					if (fi.Extension.ToLowerInvariant() == Settings.PhotoExtension.ToLowerInvariant())
 					{
 						fileName = GetFileName(prefix, Counter, digits, fi.Extension.ToLowerInvariant(), numberFirst);
 						Counter++;					
@@ -370,15 +370,15 @@ namespace CopyRename
 			}
 
 			//get list of files and sort
-			var files = Sort(source.GetFiles("*" + Settings.Ext));
+			var files = Sort(source.GetFiles("*" + Settings.PhotoExtension));
 
 			//re-iterate through files
 			foreach (FileInfo fi in files)
 			{
 				//generate a new resized image based on the source file
 				Image newImage = new ImageManipulation(fi.FullName).Resize(ConstraintType, Constraint);
-				string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, Settings.Ext));
-				//string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, newImage.Width, newImage.Height, Settings.Ext));
+				string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, Settings.PhotoExtension));
+				//string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, newImage.Width, newImage.Height, Settings.PhotoExtension));
 
 				//delete if file exists already
 				var destFile = new FileInfo(destPath);
@@ -468,8 +468,8 @@ namespace CopyRename
 			{
 				//Call copy operation
 				CopyRecursiveWithRename(
-					new DirectoryInfo(Settings.SourceDir),
-					new DirectoryInfo(Settings.DestDir),
+					new DirectoryInfo(Settings.Source),
+					new DirectoryInfo(Settings.Destination),
 					Settings.Prefix,
 					Settings.Digits,
 					Settings.UseDirName,
@@ -485,8 +485,8 @@ namespace CopyRename
 			{
 				//Call resize operation
 				ResizeToSingleDir(
-				new DirectoryInfo(Settings.SourceDir),
-				new DirectoryInfo(Settings.DestDir)
+				new DirectoryInfo(Settings.Source),
+				new DirectoryInfo(Settings.Destination)
 				);
 			}
 		}
@@ -544,7 +544,7 @@ namespace CopyRename
 
 		#region Properties
 
-		internal static Properties.Settings Settings { get; set; }
+		private static FileUtilities.Properties.Settings Settings { get; set; }
 		public static int Counter { get; set; }
 		public static int FilesProcessed { get; set; }
 		public static int TotalFiles { get; set; }

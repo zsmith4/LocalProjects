@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace CopyRename
+namespace FileUtilities
 {
 	public static class Constants
 	{

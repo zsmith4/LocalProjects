@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace CopyRename
+namespace FileUtilities
 {
     static class Program
     {

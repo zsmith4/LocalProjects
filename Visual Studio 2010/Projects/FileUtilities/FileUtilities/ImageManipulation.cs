@@ -4,7 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime;
 
-namespace CopyRename
+namespace FileUtilities
 {
 	class ImageManipulation
 	{
@@ -48,7 +48,7 @@ namespace CopyRename
 			return GetResizedImage(width, height);
 		}
 
-		public Image Resize(MainForm.ConstraintTypes constraintType, int constraint)
+		public Image Resize(FileUtilities.MainForm.ConstraintTypes constraintType, int constraint)
 		{
             int width = 0, height = 0;
 			
@@ -58,17 +58,17 @@ namespace CopyRename
 			//calculate new image dimensions
 			switch (constraintType)
 			{
-				case MainForm.ConstraintTypes.Landscape:
+				case FileUtilities.MainForm.ConstraintTypes.Landscape:
 					width = constraint;
 					height = (int)((decimal)width * HeigthWidthRatio);
 					break;
 
-				case MainForm.ConstraintTypes.Portrait:
+				case FileUtilities.MainForm.ConstraintTypes.Portrait:
 					height = constraint;
 					width = (int)((decimal)height / HeigthWidthRatio);
 					break;
 
-				case MainForm.ConstraintTypes.Ratio:
+				case FileUtilities.MainForm.ConstraintTypes.Ratio:
 					return Resize(constraint);
 			}
 

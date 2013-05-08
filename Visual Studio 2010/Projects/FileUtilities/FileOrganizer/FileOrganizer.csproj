@@ -8,7 +8,7 @@
     <ProjectGuid>{10FB328B-1D6F-4F0A-AF4F-92048C6046FA}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FileOrganizer</RootNamespace>
+    <RootNamespace>FileUtilities</RootNamespace>
     <AssemblyName>FileOrganizer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -89,6 +89,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Utilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FileUtilities\FileUtilities.csproj">
+      <Project>{17C7DAD6-4D5A-40AD-AB08-3CE9DE15E989}</Project>
+      <Name>FileUtilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

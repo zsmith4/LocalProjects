@@ -1,4 +1,4 @@
-﻿namespace CopyRename
+﻿namespace FileUtilities
 {
     public class Month
     {

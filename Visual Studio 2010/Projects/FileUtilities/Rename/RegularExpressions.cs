@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace CopyRename
+namespace FileUtilities
 {
     public static class RegularExpressions
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace CopyRename
+namespace FileUtilities
 {
 	class AddDashesToDates
 	{

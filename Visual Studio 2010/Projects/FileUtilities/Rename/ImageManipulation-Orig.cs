@@ -7,7 +7,7 @@
 //using System.Linq;
 //using System.Text;
 
-//namespace CopyRename
+//namespace FileUtilities
 //{
 //    class ImageManipulationOrig
 //    {
