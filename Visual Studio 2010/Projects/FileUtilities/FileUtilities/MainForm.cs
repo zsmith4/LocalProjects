@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using FileUtilities.Properties;
@@ -20,7 +18,7 @@ namespace FileUtilities
 			InitializeComponent();
 		}
 
-		public enum Tabs { Copy = 0, Resize = 1};
+		public enum Tabs { Organize = 0, Sort = 1, Rename = 2, Resize = 3, };
 		public enum ConstraintTypes{Landscape = 0, Portrait = 1, Ratio = 2};
 
 		#region Form Events
@@ -44,13 +42,30 @@ namespace FileUtilities
 
 			Refresh();
 			
-			if (SelectedTab == Tabs.Copy)
+			if(SelectedTab == Tabs.Sort)
 			{
-				statusLabel.Text = "Copying...";
+				statusLabel.Text = "Sorting...";
+				
+				//sort individual files
+				Worker.RunWorkerAsync(Settings.Default);
+			}
+
+			if (SelectedTab == Tabs.Organize)
+			{
+				statusLabel.Text = "Organizing...";
+
+				//sort individual files
+				Worker.RunWorkerAsync(Settings.Default);
+			}
+
+			if (SelectedTab == Tabs.Rename)
+			{
+				statusLabel.Text = "Renaming...";
 
 				//set the Counter property of CopyOperations to the latest counter
 				Counter = Settings.StartNumber;
-				Worker.RunWorkerAsync();
+
+				Worker.RunWorkerAsync(Settings.Default);
 			}
 
 			if (SelectedTab == Tabs.Resize)
@@ -74,7 +89,7 @@ namespace FileUtilities
 				}
 
 				statusLabel.Text = "Resizing...";
-                Worker.RunWorkerAsync();
+				Worker.RunWorkerAsync(Settings.Default);
 			}
 		}
 
@@ -108,7 +123,9 @@ namespace FileUtilities
 
 		private void tabContainer_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (tabContainer.SelectedIndex == 1)
+			SelectedTabIndex = tabContainer.SelectedIndex;
+
+			if (SelectedTabIndex == Convert.ToInt32(Tabs.Resize))
 			{
 				SelectedTab = Tabs.Resize;
 
@@ -124,21 +141,28 @@ namespace FileUtilities
 						radioRatio.Checked = true;
 						break;
 				}
+				
+				txtLandscape.Text = Settings.ConstraintLandscape.ToString(CultureInfo.InvariantCulture);
+				txtPortrait.Text = Settings.ConstraintPortrait.ToString(CultureInfo.InvariantCulture);
+				txtRatio.Text = Settings.ConstraintRatio.ToString(CultureInfo.InvariantCulture);
 			}
-			else
+			if (SelectedTabIndex == Convert.ToInt32(Tabs.Sort))
 			{
-				SelectedTab = Tabs.Copy;
+				SelectedTab = Tabs.Sort;
 			}
 
-			txtLandscape.Text = Settings.ConstraintLandscape.ToString();
-			txtPortrait.Text = Settings.ConstraintPortrait.ToString();
-			txtRatio.Text = Settings.ConstraintRatio.ToString();
+			if (SelectedTabIndex == Convert.ToInt32(Tabs.Organize))
+			{
+				SelectedTab = Tabs.Organize;
+			}
 
-		}
+			if (SelectedTabIndex == Convert.ToInt32(Tabs.Rename))
+			{
+				SelectedTab = Tabs.Rename;
+			}
 
-		private void cmdCancel_MouseHover(object sender, EventArgs e)
-		{
-			Cursor = Cursors.Default;
+
+
 		}
 
 		private void EnableForm(bool enable)
@@ -157,7 +181,7 @@ namespace FileUtilities
 		private void UpdateExample(bool useDir)
 		{
 			string exPrefix = txtPrefix.Text;
-			if (chkUseDir.Checked)
+			if (useDir)
 			{
 				exPrefix = "<directory name>";
 			}
@@ -165,6 +189,93 @@ namespace FileUtilities
 			txtExample.Text = GetFileName(exPrefix, Settings.StartNumber, Convert.ToInt16(cboDigits.SelectedItem), Settings.PhotoExtension, chkNumberFirst.Checked);
 		}
 		#endregion
+
+		#region Background worker events
+		private void Worker_DoWork(object sender, DoWorkEventArgs e)
+		{
+			var settings = (Settings)e.Argument;
+
+			if (SelectedTab == Tabs.Organize)
+			{
+				Recursive.Organize(
+					new DirectoryInfo(settings.Source),
+					new DirectoryInfo(settings.Destination),
+					settings.AddDashesToDates,
+					settings.Overwrite,
+					settings.Skip,
+					settings.UseMonthSubDirs
+					);
+			}
+
+			if (SelectedTab == Tabs.Sort)
+			{
+				Recursive.SortIndividualPicturesByDate(
+					new DirectoryInfo(settings.Source),
+					new DirectoryInfo(settings.Destination),
+					chkUseYearMonthDir.Checked, chkSortCopy.Checked);
+			}
+
+			if (SelectedTab == Tabs.Rename)
+			{
+				//Call copy operation
+				CopyRecursiveWithRename(
+					new DirectoryInfo(settings.Source),
+					new DirectoryInfo(settings.Destination),
+					settings.Prefix,
+					settings.Digits,
+					settings.UseDirName,
+					settings.NumberFirst
+					);
+
+				//save the counter
+				settings.StartNumber = Counter;
+				Settings.Save(); //Must be capital case.  'settings' is a local variable
+			}
+
+			if (SelectedTab == Tabs.Resize)
+			{
+				//Call resize operation
+				ResizeToSingleDir(
+				new DirectoryInfo(settings.Source),
+				new DirectoryInfo(settings.Destination)
+				);
+			}
+		}
+
+		private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+		{
+			//update form with latest counter
+			if (SelectedTab == Tabs.Rename)
+			{
+				txtStart.Text = Settings.StartNumber.ToString(CultureInfo.InvariantCulture);
+			}
+
+			//reset cursor
+			Cursor = Cursors.Default;
+			cmdCancel.Enabled = false;
+			cmdRun.Enabled = true;
+			statusProgress.Value = statusProgress.Maximum;
+			EnableForm(true);
+
+			if (WorkerCancelled)
+			{
+				statusLabel.Text = "Operation cancelled";
+				MessageBox.Show("Operation cancelled!", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			}
+			else
+			{
+				statusLabel.Text = "Operation complete!";
+				MessageBox.Show("Operation complete!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}
+		}
+
+		private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+		{
+			statusProgress.Value = FilesProcessed;
+			statusLabel.Text = FilesProcessed + "\\" + TotalFiles;
+		}
+
+		#endregion Background worker events
 
 		#region Save Settings
 
@@ -177,7 +288,7 @@ namespace FileUtilities
 		
 		private void LoadSettings()
 		{	
-			Settings = FileUtilities.Properties.Settings.Default;
+			Settings = Settings.Default;
 
 			txtSourceDirectory.Text = Settings.Source;
 			txtOutputDirectory.Text = Settings.Destination;
@@ -188,8 +299,16 @@ namespace FileUtilities
 			
 			chkUseDir.Checked = Settings.UseDirName;
 			chkNumberFirst.Checked = Settings.NumberFirst;
-			txtStart.Text = Settings.StartNumber.ToString();
+			txtStart.Text = Settings.StartNumber.ToString(CultureInfo.InvariantCulture);
 
+
+			chkOverwrite.Checked = Settings.Overwrite;
+			chkSkipExisting.Checked = Settings.Skip;
+			chkAddDashesToDates.Checked = Settings.AddDashesToDates;
+			chkUseYearMonthDir.Checked = Settings.UseMonthSubDirs;
+
+			chkSortCopy.Checked = Settings.CopyWhenSorting;
+			
 			UpdateExample(chkUseDir.Checked);
 		}
 
@@ -278,6 +397,8 @@ namespace FileUtilities
 			var dialog = new FolderBrowserDialog { SelectedPath = txtSourceDirectory.Text };
 			dialog.ShowDialog();
 			txtSourceDirectory.Text = dialog.SelectedPath;
+			Settings.Source = txtSourceDirectory.Text;
+			Settings.Save();
 		}
 
 		private void btnOutputBrowse_Click(object sender, EventArgs e)
@@ -285,6 +406,8 @@ namespace FileUtilities
 			var dialog = new FolderBrowserDialog { SelectedPath = txtOutputDirectory.Text };
 			dialog.ShowDialog();
 			txtOutputDirectory.Text = dialog.SelectedPath;
+			Settings.Destination = txtOutputDirectory.Text;
+			Settings.Save();
 		}
 		#endregion
 
@@ -377,7 +500,7 @@ namespace FileUtilities
 			foreach (FileInfo fi in files)
 			{
 				//generate a new resized image based on the source file
-				Image newImage = new FileUtilities.ImageManipulation(fi.FullName).Resize(ConstraintType, Constraint);
+				Image newImage = new ImageManipulation(fi.FullName).Resize(ConstraintType, Constraint);
 				string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, Settings.PhotoExtension));
 				//string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, newImage.Width, newImage.Height, Settings.PhotoExtension));
 
@@ -415,10 +538,10 @@ namespace FileUtilities
 		{
 			if (numberFirst)
 			{
-				return counter.ToString().PadLeft(digits, '0') + "_" + prefix + ext;
+				return counter.ToString(CultureInfo.InvariantCulture).PadLeft(digits, '0') + "_" + prefix + ext;
 			}
 			
-			return prefix + "_" + counter.ToString().PadLeft(digits, '0') + ext;
+			return string.Format("{0}_{1}{2}", prefix, counter.ToString(CultureInfo.InvariantCulture).PadLeft(digits, '0'), ext);
 		}
 
 		public static string GetFileName(string filename, ConstraintTypes constraintType, int constraint, int x, int y, string ext)
@@ -462,95 +585,31 @@ namespace FileUtilities
 
 		#endregion Recursive copy
 
-		#region Background worker events
-		private void Worker_DoWork(object sender, DoWorkEventArgs e)
-		{
-			if (SelectedTab == Tabs.Copy)
-			{
-				//Call copy operation
-				CopyRecursiveWithRename(
-					new DirectoryInfo(Settings.Source),
-					new DirectoryInfo(Settings.Destination),
-					Settings.Prefix,
-					Settings.Digits,
-					Settings.UseDirName,
-					Settings.NumberFirst
-					);
-
-				//save the counter
-				Settings.StartNumber = Counter;
-				Settings.Save();
-			}
-
-			if (SelectedTab == Tabs.Resize)
-			{
-				//Call resize operation
-				ResizeToSingleDir(
-				new DirectoryInfo(Settings.Source),
-				new DirectoryInfo(Settings.Destination)
-				);
-			}
-		}
-        
-		private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-		{
-			//update form with latest counter
-			if (SelectedTab == Tabs.Copy)
-			{
-				txtStart.Text = Settings.StartNumber.ToString();
-			}
-
-			//reset cursor
-			Cursor = Cursors.Default;
-			cmdCancel.Enabled = false;
-			cmdRun.Enabled = true;
-			statusProgress.Value = statusProgress.Maximum;
-			EnableForm(true);
-
-			if (WorkerCancelled)
-			{
-			    statusLabel.Text = "Operation cancelled";
-				MessageBox.Show("Operation cancelled!", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-			}
-			else
-			{
-				statusLabel.Text = "Operation complete!";
-				MessageBox.Show("Operation complete!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-			}
-		}
-
-		private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-		{
-			statusProgress.Value = FilesProcessed;
-			statusLabel.Text = FilesProcessed + "\\" + TotalFiles;
-		}
-
-		#endregion Background worker events
-
 		#region Sorting
 		public static List<FileInfo> Sort(FileInfo[] fileList)
 		{
 			List<FileInfo> newList = fileList.ToList();
-			newList.ToList().Sort((a, b) => String.Compare(a.Name, b.Name));
+			newList.ToList().Sort((a, b) => String.CompareOrdinal(a.Name, b.Name));
 			return newList;
 		}
 
 		public static List<DirectoryInfo> Sort(DirectoryInfo[] dirList)
 		{
 			List<DirectoryInfo> newList = dirList.ToList();
-			newList.ToList().Sort((a, b) => String.Compare(a.Name, b.Name));
+			newList.ToList().Sort((a, b) => String.CompareOrdinal(a.Name, b.Name));
 			return newList;
 		}
 		#endregion
 
 		#region Properties
 
-		internal static FileUtilities.Properties.Settings Settings { get; set; }
+		internal static Settings Settings { get; set; }
 		public static int Counter { get; set; }
 		public static int FilesProcessed { get; set; }
 		public static int TotalFiles { get; set; }
 		private static bool WorkerCancelled { get; set; }
 		private static Tabs SelectedTab { get; set; }
+		private static int SelectedTabIndex { get; set; }
 		public static ConstraintTypes ConstraintType { get; set; }
 		public static int Constraint { get; set; }
         
@@ -558,15 +617,55 @@ namespace FileUtilities
 
 		private void cmdCancel_MouseLeave(object sender, EventArgs e)
 		{
-			if (Worker.IsBusy)
-			{
-				Cursor = Cursors.WaitCursor;
-			}
-			else
-			{
-				Cursor = Cursors.Default;
-			}
+			Cursor = Worker.IsBusy ? Cursors.WaitCursor : Cursors.Default;
 		}
 
+		private void txtSourceDirectory_Leave(object sender, EventArgs e)
+		{
+			Settings.Source = txtSourceDirectory.Text;
+			Settings.Save();
+		}
+
+		private void txtOutputDirectory_Leave(object sender, EventArgs e)
+		{
+			Settings.Destination = txtOutputDirectory.Text;
+			Settings.Save();
+		}
+
+		private void chkAddDashesToDates_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.AddDashesToDates = chkAddDashesToDates.Checked;
+			Settings.Save();
+		}
+
+		private void chkOverwrite_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.Overwrite = chkOverwrite.Checked;
+			Settings.Save();
+		}
+
+		private void chkSortCopy_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.CopyWhenSorting = chkSortCopy.Checked;
+			Settings.Save();
+		}
+		
+		private void cmdCancel_MouseHover(object sender, EventArgs e)
+		{
+			Cursor = Cursors.Default;
+		}
+
+		private void chkSkipExisting_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.Skip = chkSkipExisting.Checked;
+			Settings.Save();
+		}
+
+		private void chkUseYearMonthDir_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.UseMonthSubDirs = chkUseYearMonthDir.Checked;
+			Settings.Save();
+		}
 	}
+
 }

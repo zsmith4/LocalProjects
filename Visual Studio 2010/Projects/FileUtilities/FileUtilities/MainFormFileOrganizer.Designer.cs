@@ -1,6 +1,6 @@
 ﻿namespace FileOrganizer
 {
-    partial class MainForm
+    partial class MainFormFileOrganizer
     {
         /// <summary>
         /// Required designer variable.

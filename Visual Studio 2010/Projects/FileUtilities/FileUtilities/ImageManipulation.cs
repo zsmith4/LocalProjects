@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Runtime;
 
 namespace FileUtilities
@@ -48,27 +47,27 @@ namespace FileUtilities
 			return GetResizedImage(width, height);
 		}
 
-		public Image Resize(FileUtilities.MainForm.ConstraintTypes constraintType, int constraint)
+		public Image Resize(MainForm.ConstraintTypes constraintType, int constraint)
 		{
             int width = 0, height = 0;
 			
 			//get ratio of original SourceImage
-			decimal HeigthWidthRatio = (decimal)SourceImage.Height / (decimal)SourceImage.Width;
+			decimal HeigthWidthRatio = SourceImage.Height / (decimal)SourceImage.Width;
 			
 			//calculate new image dimensions
 			switch (constraintType)
 			{
-				case FileUtilities.MainForm.ConstraintTypes.Landscape:
+				case MainForm.ConstraintTypes.Landscape:
 					width = constraint;
-					height = (int)((decimal)width * HeigthWidthRatio);
+					height = (int)(width * HeigthWidthRatio);
 					break;
 
-				case FileUtilities.MainForm.ConstraintTypes.Portrait:
+				case MainForm.ConstraintTypes.Portrait:
 					height = constraint;
-					width = (int)((decimal)height / HeigthWidthRatio);
+					width = (int)(height / HeigthWidthRatio);
 					break;
 
-				case FileUtilities.MainForm.ConstraintTypes.Ratio:
+				case MainForm.ConstraintTypes.Ratio:
 					return Resize(constraint);
 			}
 

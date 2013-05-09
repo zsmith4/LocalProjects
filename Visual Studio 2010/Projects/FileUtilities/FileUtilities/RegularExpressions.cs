@@ -8,15 +8,17 @@ namespace FileUtilities
     {
         static RegularExpressions()
         {
-            var regExDict = new Dictionary<string, string>();
-            //YY(YY)-M(M)
-            regExDict.Add(@".*\b(?<year>\d{2,4})-(?<month>\d{1,2})\b.*", "${month}/${year}");
-
-            //YYYYMMDD
-            regExDict.Add(@".*\b(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}");
-            
-            //YY(YY)M(M)D(D)
-            regExDict.Add(@".*\b(?<year>\d{2,4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+            var regExDict = new Dictionary<string, string>
+                            {
+                            	{@"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}"},
+                            	{@"(?<year>\d{4})(?<month>\d{2})\b.*", "${month}/1/${year}"},
+                            	{@"(?<year>\d{4})\b.*", "01/01/${year}"}
+                            };
+			
+			//YY(YY)M(M)D(D)
+			//regExDict.Add(@".*\b(?<year>\d{4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+			//regExDict.Add(@".*\b(?<year>\d{2,4})(?<month>\d{1,2})(?<day>\d{1,2})\b.*", "${month}/${day}/${year}");
+			//regExDict.Add(@".*\b(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})\b.*", "${month}/${day}/${year}");
 
             RegExDict = regExDict;
         }
@@ -48,6 +50,7 @@ namespace FileUtilities
 		public static string AddDashesToDateInDirName(string dirName)
 		{
 			//define pattern and replacement
+			//look for yyyymmdd(remainder) and change to yyyy-mm-dd(remainder) 
 			const string pattern = @"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<remain>\b.*)";
 			const string replacement = "${year}-${month}-${day}${remain}";
 
@@ -99,6 +102,23 @@ namespace FileUtilities
 
         	return date;
         }
+
+		public static bool CheckIfYearMonthFormatOnly(string dirName)
+		{
+			const string pattern = @"(?<year>\d{4})-(?<month>\d{2})(?<remain>\b.*)";
+			const string replacement = "${remain}";
+
+			//perform replacement
+			var regEx = new Regex(pattern);
+			string result = regEx.Replace(dirName, replacement);
+
+			if (String.IsNullOrEmpty(result))
+			{
+				return true;
+			}
+
+			return false;
+		}
 
         public static Dictionary<string, string> RegExDict { get; set; }
     }
