@@ -94,4 +94,15 @@ namespace FileUtilities
 		public string FullName { get; set; }
 		public string Abbreviation { get; set; }
 	}
+
+	public class Result
+	{
+		public Result(string value1, string value2)
+		{
+			Key = value1;
+			Value = value2;
+		}
+		public string Key { get; set; }
+		public string Value { get; set; }
+	}
 }

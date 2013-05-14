@@ -99,7 +99,6 @@ namespace FileUtilities
 				using (var memFailPoint = new MemoryFailPoint(arraySize))
 				{
 					Image canvas = new Bitmap(width, height, SourceImage.PixelFormat);
-
 					Graphics Graphic = Graphics.FromImage(canvas);
 					Graphic.CompositingQuality = CompositingQuality.HighQuality;
 					Graphic.SmoothingMode = SmoothingMode.HighQuality;
@@ -130,6 +129,34 @@ namespace FileUtilities
 			fullSizeImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
 
 			return fullSizeImage;
+		}
+
+		public static Image FlipImage(String path, RotateFlipType rotateType)
+		{
+			var image = Image.FromFile(path);
+			image.RotateFlip(rotateType);
+			return image;
+		}
+
+		public static bool CompareWithRotate(string path1, string path2)
+		{
+			//doesn't work
+			if (FlipImage(path1, RotateFlipType.RotateNoneFlipNone) == FlipImage(path2, RotateFlipType.Rotate90FlipNone))
+			{
+				return true;
+			}
+
+			if (FlipImage(path1, RotateFlipType.RotateNoneFlipNone) == FlipImage(path2, RotateFlipType.Rotate270FlipNone))
+			{
+				return true;
+			}
+
+			if (FlipImage(path1, RotateFlipType.RotateNoneFlipNone) == FlipImage(path2, RotateFlipType.Rotate180FlipNone))
+			{
+				return true;
+			}
+
+			return false;
 		}
 
 		#region Properties

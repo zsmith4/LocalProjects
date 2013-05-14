@@ -18,8 +18,9 @@ namespace FileUtilities
 			InitializeComponent();
 		}
 
-		public enum Tabs { Organize = 0, Sort = 1, Rename = 2, Resize = 3, };
+		public enum Tabs { Organize = 0, Sort = 1, Rename = 2, Resize = 3, Duplicates = 4 };
 		public enum ConstraintTypes{Landscape = 0, Portrait = 1, Ratio = 2};
+		const int BYTES_TO_READ = sizeof(Int64);
 
 		#region Form Events
 
@@ -91,6 +92,21 @@ namespace FileUtilities
 				statusLabel.Text = "Resizing...";
 				Worker.RunWorkerAsync(Settings.Default);
 			}
+
+			if (SelectedTab == Tabs.Duplicates)
+			{
+				statusLabel.Text = "Finding duplicates...";
+
+				if(Duplicates != null && Duplicates.Count > 0)
+				{
+					Duplicates.Clear();
+				}
+				gridDuplicates.Rows.Clear();
+				gridDuplicates.Refresh();
+
+				Worker.RunWorkerAsync(Settings.Default);
+
+			}
 		}
 
 		private void cmdCancel_Click(object sender, EventArgs e)
@@ -124,6 +140,11 @@ namespace FileUtilities
 		private void tabContainer_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			SelectedTabIndex = tabContainer.SelectedIndex;
+			txtOutputDirectory.Enabled = true;
+			btnOutputBrowse.Enabled = true;
+
+			Settings.SelectedTab = SelectedTabIndex;
+			Settings.Save();
 
 			if (SelectedTabIndex == Convert.ToInt32(Tabs.Resize))
 			{
@@ -161,6 +182,17 @@ namespace FileUtilities
 				SelectedTab = Tabs.Rename;
 			}
 
+			if (SelectedTabIndex == Convert.ToInt32(Tabs.Duplicates))
+			{
+				SelectedTab = Tabs.Duplicates;
+
+				if (!chkMoveDuplicates.Checked)
+				{
+					txtOutputDirectory.Enabled = false;
+					btnOutputBrowse.Enabled = false;
+				}
+				
+			}
 
 
 		}
@@ -172,6 +204,95 @@ namespace FileUtilities
 			btnSourceBrowse.Enabled = enable;
 			btnOutputBrowse.Enabled = enable;
 			tabContainer.Enabled = enable;
+		}
+
+		private void cmdCancel_MouseLeave(object sender, EventArgs e)
+		{
+			Cursor = Worker.IsBusy ? Cursors.WaitCursor : Cursors.Default;
+		}
+
+		private void cmdCancel_MouseHover(object sender, EventArgs e)
+		{
+			Cursor = Cursors.Default;
+		}
+
+		private void txtSourceDirectory_Leave(object sender, EventArgs e)
+		{
+			Settings.Source = txtSourceDirectory.Text;
+			Settings.Save();
+		}
+
+		private void txtOutputDirectory_Leave(object sender, EventArgs e)
+		{
+			Settings.Destination = txtOutputDirectory.Text;
+			Settings.Save();
+		}
+
+		private void chkAddDashesToDates_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.AddDashesToDates = chkAddDashesToDates.Checked;
+			Settings.Save();
+		}
+
+		private void chkOverwrite_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.Overwrite = chkOverwrite.Checked;
+			Settings.Save();
+		}
+
+		private void chkSortCopy_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.CopyWhenSorting = chkSortCopy.Checked;
+			Settings.Save();
+		}
+
+		private void chkSkipExisting_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.Skip = chkSkipExisting.Checked;
+			Settings.Save();
+		}
+
+		private void chkUseYearMonthDir_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.UseMonthSubDirs = chkUseYearMonthDir.Checked;
+			Settings.Save();
+		}
+
+		private void chkMoveDuplicates_CheckedChanged(object sender, EventArgs e)
+		{
+			Settings.MoveDuplicates = chkMoveDuplicates.Checked;
+			Settings.Save();
+
+			//disable destination directory unless move is specified
+			if (chkMoveDuplicates.Checked)
+			{
+				txtOutputDirectory.Enabled = true;
+				btnOutputBrowse.Enabled = true;
+			}
+			else
+			{
+				txtOutputDirectory.Enabled = false;
+				btnOutputBrowse.Enabled = false;
+			}
+
+		}
+
+		private void MainForm_Activated(object sender, EventArgs e)
+		{
+			if (SelectedTabIndex == Convert.ToInt32(Tabs.Duplicates))
+			{
+				//disable destination directory unless move is specified
+				if (chkMoveDuplicates.Checked)
+				{
+					txtOutputDirectory.Enabled = true;
+					btnOutputBrowse.Enabled = true;
+				}
+				else
+				{
+					txtOutputDirectory.Enabled = false;
+					btnOutputBrowse.Enabled = false;
+				}
+			}
 		}
 
 		#endregion Form Events
@@ -197,7 +318,7 @@ namespace FileUtilities
 
 			if (SelectedTab == Tabs.Organize)
 			{
-				Recursive.Organize(
+				Organize(
 					new DirectoryInfo(settings.Source),
 					new DirectoryInfo(settings.Destination),
 					settings.AddDashesToDates,
@@ -209,7 +330,7 @@ namespace FileUtilities
 
 			if (SelectedTab == Tabs.Sort)
 			{
-				Recursive.SortIndividualPicturesByDate(
+				SortIndividualPicturesByDate(
 					new DirectoryInfo(settings.Source),
 					new DirectoryInfo(settings.Destination),
 					chkUseYearMonthDir.Checked, chkSortCopy.Checked);
@@ -240,6 +361,19 @@ namespace FileUtilities
 				new DirectoryInfo(settings.Destination)
 				);
 			}
+
+			if (SelectedTab == Tabs.Duplicates)
+			{
+				//Call duplicates operation
+				var results = FindDuplicates(
+				new DirectoryInfo(settings.Source),
+				new DirectoryInfo(settings.Destination), 
+				settings.MoveDuplicates
+				);
+
+				Duplicates = results;
+
+			}
 		}
 
 		private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -257,13 +391,24 @@ namespace FileUtilities
 			statusProgress.Value = statusProgress.Maximum;
 			EnableForm(true);
 
+			if (SelectedTab == Tabs.Duplicates && Duplicates.Count > 0)
+			{
+				//Fill the grid with results
+				foreach (var entry in Duplicates)
+				{
+					gridDuplicates.Rows.Add(entry.Key, entry.Value);
+				}
+			}	
+			
 			if (WorkerCancelled)
 			{
+				WorkerCancelled = true;
 				statusLabel.Text = "Operation cancelled";
 				MessageBox.Show("Operation cancelled!", "Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 			}
 			else
 			{
+				WorkerCancelled = false;
 				statusLabel.Text = "Operation complete!";
 				MessageBox.Show("Operation complete!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
 			}
@@ -308,6 +453,9 @@ namespace FileUtilities
 			chkUseYearMonthDir.Checked = Settings.UseMonthSubDirs;
 
 			chkSortCopy.Checked = Settings.CopyWhenSorting;
+			chkMoveDuplicates.Checked = Settings.MoveDuplicates;
+
+			tabContainer.SelectedIndex = Settings.SelectedTab;
 			
 			UpdateExample(chkUseDir.Checked);
 		}
@@ -434,6 +582,14 @@ namespace FileUtilities
 				//re-iterate through files
 				foreach (FileInfo fi in files)
 				{
+					if (Worker.CancellationPending)
+					{
+						Worker.CancelAsync();
+						WorkerCancelled = true;
+
+						return;
+					}
+
 					//get new file name and copy to dest
 					if (useDirName)
 					{
@@ -455,9 +611,7 @@ namespace FileUtilities
 					fi.CopyTo(Path.Combine(dest.ToString(), fileName), true);
 
 					//increment counter property
-
 					FilesProcessed++;
-
 					Worker.ReportProgress(FilesProcessed/TotalFiles);
 
 				}
@@ -475,6 +629,8 @@ namespace FileUtilities
 					DirectoryInfo nextTargetSubDir = dest.CreateSubdirectory(diSourceSubDir.Name);
 					CopyRecursiveWithRename(diSourceSubDir, nextTargetSubDir, prefix, digits, useDirName, numberFirst);
 				}
+
+				WorkerCancelled = false;
 			
 		}
 
@@ -496,25 +652,33 @@ namespace FileUtilities
 			//get list of files and sort
 			var files = Sort(source.GetFiles("*" + Settings.PhotoExtension));
 
+			TotalFiles = files.Count;
+
 			//re-iterate through files
 			foreach (FileInfo fi in files)
 			{
-				//generate a new resized image based on the source file
-				Image newImage = new ImageManipulation(fi.FullName).Resize(ConstraintType, Constraint);
-				string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, Settings.PhotoExtension));
-				//string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, newImage.Width, newImage.Height, Settings.PhotoExtension));
-
-				//delete if file exists already
-				var destFile = new FileInfo(destPath);
-				if (destFile.Exists)
+				try
 				{
-					destFile.Delete();
+					//generate a new resized image based on the source file
+					Image newImage = new ImageManipulation(fi.FullName).Resize(ConstraintType, Constraint);
+					string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, Settings.PhotoExtension));
+					//string destPath = Path.Combine(dest.ToString(), GetFileName(fi.Name.Replace(fi.Extension, string.Empty), ConstraintType, Constraint, newImage.Width, newImage.Height, Settings.PhotoExtension));
+
+					//delete if file exists already
+					var destFile = new FileInfo(destPath);
+					if (destFile.Exists)
+					{
+						destFile.Delete();
+					}
+
+					//save original file as new file
+					newImage.Save(destPath, ImageFormat.Jpeg);
+					newImage.Dispose();
 				}
-
-				//save original file as new file
-				newImage.Save(destPath, ImageFormat.Jpeg);
-				newImage.Dispose();
-
+				finally
+				{
+					MessageBox.Show("Encountered an error while processing \n" + fi.FullName);
+				}
 				//increment files processed
 				FilesProcessed++;
 				Worker.ReportProgress(FilesProcessed / TotalFiles);
@@ -532,6 +696,8 @@ namespace FileUtilities
 
 				ResizeToSingleDir(diSourceSubDir, dest);
 			}
+
+			WorkerCancelled = false;
 		}
 
 		public static string GetFileName(string prefix, int counter, int digits, string ext, bool numberFirst)
@@ -583,15 +749,460 @@ namespace FileUtilities
 
 		#endregion
 
-		#endregion Recursive copy
+		internal void CopyRecursive(DirectoryInfo source, DirectoryInfo dest)
+		{
+			//create dest directory if it doesn't exist
+			if (!Directory.Exists(dest.FullName))
+			{
+				Directory.CreateDirectory(dest.FullName);
+			}
 
-		#region Sorting
-		public static List<FileInfo> Sort(FileInfo[] fileList)
+			//get list of files and sort
+			var files = Sort(source.GetFiles("*.*"));
+
+			TotalFiles = files.Count;
+
+			//re-iterate through files
+			foreach (FileInfo fi in files)
+			{
+
+				if (Worker.CancellationPending)
+				{
+					Worker.CancelAsync();
+					WorkerCancelled = true;
+
+					return;
+				}
+
+				//get new file name and copy to dest
+				//var fileName = GetFileName(prefix, Counter, digits, fi.Extension, numberFirst);
+				fi.CopyTo(Path.Combine(dest.ToString(), fi.Name), true);
+
+				//increment counter property
+				FilesProcessed++;
+				Worker.ReportProgress(FilesProcessed / TotalFiles);
+
+			}
+
+			//recursively copy each subdirectory
+			foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+			{
+				DirectoryInfo nextTargetSubDir = dest.CreateSubdirectory(diSourceSubDir.Name);
+				CopyRecursive(diSourceSubDir, nextTargetSubDir);
+			}
+
+			WorkerCancelled = false;
+		}
+
+		internal static List<FileInfo> Sort(FileInfo[] fileList)
 		{
 			List<FileInfo> newList = fileList.ToList();
 			newList.ToList().Sort((a, b) => String.CompareOrdinal(a.Name, b.Name));
 			return newList;
 		}
+
+		internal void SortIndividualPicturesByDate(DirectoryInfo source, DirectoryInfo dest, bool useYearMonthDir, bool copy)
+		{
+			//move files based on their file date
+			var files = source.GetFiles("*", SearchOption.TopDirectoryOnly);
+			foreach (var file in files)
+			{
+				if (Worker.CancellationPending)
+				{
+					Worker.CancelAsync();
+					WorkerCancelled = true;
+
+					return;
+				}
+
+				var fileDate = DateFunctions.GetReferenceDate(file);
+
+				if (fileDate != DateTime.MinValue)
+				{
+					var path = String.Format(useYearMonthDir ? "{0}\\{1:yyyy}\\{1:yyyy-MM}" : "{0}\\{1:yyyy}", dest.FullName, fileDate);
+
+					var pathWithName = Path.Combine(path, file.Name);
+
+					var fiExist = new FileInfo(pathWithName);
+					var di = new DirectoryInfo(path);
+
+					//never overwrite
+					if (!fiExist.Exists)
+					{
+						if (!di.Exists)
+						{
+							di.Create();
+						}
+
+						if (copy)
+						{
+							file.CopyTo(pathWithName, false);
+						}
+						else
+						{
+							file.MoveTo(pathWithName);
+						}
+
+					}
+				}
+			}
+
+			WorkerCancelled = false;
+		}
+
+		internal void Organize(DirectoryInfo source, DirectoryInfo dest, bool addDashesToDates, bool overwrite, bool skip, bool useMonthSubDirs)
+		{
+			string newDirName = string.Empty;
+			string sourceDirName = string.Empty;
+			string dirNewName = string.Empty;
+
+			//create destination if it doesn't exist
+			if (!dest.Exists)
+			{
+				dest.Create();
+			}
+
+			//find instances of yyyymmdd and switch them to yyyy-mm-dd.  THIS UPDATES THE SOURCE DIRECTORY, NOT THE DESTINATION
+			if (addDashesToDates)
+			{
+				var allDirs = source.GetDirectories("*", SearchOption.AllDirectories);
+				foreach (var subDir in allDirs)
+				{
+					if (Worker.CancellationPending)
+					{
+						Worker.CancelAsync();
+						WorkerCancelled = true;
+
+						return;
+					}
+
+					string newName = RegularExpressions.AddDashesToDateInDirName(subDir.Name);
+					var di = new DirectoryInfo(Path.Combine(subDir.Parent.FullName, newName));
+
+					if (di.FullName != subDir.FullName)
+					{
+						subDir.MoveTo(di.FullName);
+					}
+				}
+
+			}
+
+			var counter = source.GetFiles("*.*", SearchOption.AllDirectories);
+			TotalFiles = counter.Count();
+
+			//get year directories
+			var yearDirs = source.GetDirectories("*", SearchOption.TopDirectoryOnly);
+			foreach (var yearDir in yearDirs)
+			{
+
+				if (Worker.CancellationPending)
+				{
+					Worker.CancelAsync();
+					WorkerCancelled = true;
+
+					return;
+				}
+
+				var yearInt = 0;
+				var monthInt = 0;
+
+				//get year from directory name
+				var year = RegularExpressions.ParseDate(DateFunctions.RemoveSpecialChars(yearDir.Name));
+
+				bool nonYearDir;
+				if (year != DateTime.MinValue)
+				{
+					yearInt = year.Year;
+					nonYearDir = false;
+				}
+				else
+				{
+					nonYearDir = true;
+					string sourcDir = Path.Combine(source.FullName, yearDir.Name);
+					string destDir = Path.Combine(dest.FullName, yearDir.Name);
+					var diSource = new DirectoryInfo(sourcDir);
+					var diDest = new DirectoryInfo(destDir);
+
+					//copy everything to destination directory
+					CopyRecursive(diSource, diDest);
+					//break;
+				}
+
+				//get month-level directories
+				var monthDirs = yearDir.GetDirectories("*", SearchOption.TopDirectoryOnly);
+				foreach (var monthDir in monthDirs)
+				{
+
+					if (Worker.CancellationPending)
+					{
+						Worker.CancelAsync();
+						WorkerCancelled = true;
+
+						return;
+					}
+
+					string monthDirDesc = RegularExpressions.AddDashesToDateInDirName(monthDir.Name);
+
+					//determine the month
+					var month = RegularExpressions.ParseDate(DateFunctions.RemoveSpecialChars(monthDirDesc));
+					if (month != DateTime.MinValue)
+					{
+						monthInt = month.Month;
+					}
+
+					if (monthInt > 0)
+					{
+						//dest
+						var combinedDate = new DateTime(yearInt, monthInt, 1);  //exception when a year folder only has text
+
+						if (useMonthSubDirs)
+						{
+							dirNewName = String.Format("{0:yyyy-MM}", combinedDate);
+							newDirName = Path.Combine(dest.FullName, yearInt.ToString(CultureInfo.InvariantCulture));
+							newDirName = Path.Combine(newDirName, dirNewName);
+
+							if (monthDirDesc == monthDir.Name)
+							{
+								if (!RegularExpressions.CheckIfYearMonthFormatOnly(monthDir.Name))
+								{
+									newDirName = Path.Combine(newDirName, monthDirDesc);
+								}
+							}
+						}
+						else //THIS SECTION WORKS
+						{
+							dirNewName = !RegularExpressions.CheckIfYearMonthFormatOnly(monthDir.Name) ? monthDir.Name : string.Empty;
+
+							newDirName = Path.Combine(dest.FullName, yearInt.ToString(CultureInfo.InvariantCulture));
+							newDirName = Path.Combine(newDirName, dirNewName);
+
+						}
+
+						//source
+						sourceDirName = Path.Combine(source.FullName, yearDir.Name);
+						sourceDirName = Path.Combine(sourceDirName, monthDir.Name);
+					}
+					else
+					{
+						//source
+						sourceDirName = monthDir.FullName;
+						newDirName = Path.Combine(dest.FullName, yearDir.Name);
+						newDirName = Path.Combine(newDirName, monthDir.Name);
+					}
+
+					//create directory info's
+					var diDestName = new DirectoryInfo(newDirName);
+					var diSourceName = new DirectoryInfo(sourceDirName);
+
+					CopyTo(diSourceName, diDestName, overwrite, skip);
+
+					//increment counter property
+					FilesProcessed++;
+					Worker.ReportProgress(FilesProcessed / TotalFiles);
+
+				}
+				if (!nonYearDir)
+				{
+					//get any files in the year directory
+					var yearFiles = yearDir.GetFiles();
+					//copy files from year directory into sub
+					foreach (var yearFile in yearFiles)
+					{
+						string yearMonthPath = Path.Combine(yearDir.Name,
+						String.Format("{0:yyyy-MM}", DateFunctions.GetReferenceDate(yearFile)));
+						yearMonthPath = Path.Combine(dest.FullName, yearMonthPath);
+						var diNew = new DirectoryInfo(yearMonthPath);
+						if (!diNew.Exists)
+						{
+							diNew.Create();
+						}
+						var fileName = Path.Combine(yearMonthPath, yearFile.Name);
+						yearFile.CopyTo(fileName, true);
+
+						//increment counter property
+						FilesProcessed++;
+						Worker.ReportProgress(FilesProcessed / TotalFiles);
+					}
+				}
+
+			}
+
+			WorkerCancelled = false;
+		}
+
+		public static void CopyTo(DirectoryInfo source, DirectoryInfo target, bool overwrite, bool skip)
+		{
+			// Check if the target directory exists, if not, create it.
+			if (!Directory.Exists(target.FullName))
+			{
+				Directory.CreateDirectory(target.FullName);
+			}
+
+			// Copy each file into it's new directory.
+			foreach (FileInfo fi in source.GetFiles())
+			{
+				//Console.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
+				//check if destination file exists
+				string path = Path.Combine(target.ToString(), fi.Name);
+
+				//check for existing file
+				var existingFi = new FileInfo(path);
+				if (existingFi.Exists)
+				{
+					if (!skip)
+					{
+						if (!overwrite)
+						{
+							path = Path.Combine(target.ToString(), AddTimestamp(fi));
+						}
+
+						fi.CopyTo(path, overwrite);
+					}
+				}
+				else
+				{
+					fi.CopyTo(path, true);
+				}
+			}
+
+			// Copy each subdirectory using recursion.
+			foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+			{
+				DirectoryInfo nextTargetSubDir =
+					target.CreateSubdirectory(diSourceSubDir.Name);
+				CopyTo(diSourceSubDir, nextTargetSubDir, overwrite, skip);
+			}
+		}
+
+		public static string AddTimestamp(FileInfo fileInfo)
+		{
+			string extension = fileInfo.Extension;
+			string name = fileInfo.Name;
+			name = name.Remove(name.LastIndexOf(".", StringComparison.Ordinal));
+			name = name + "_Duplicate_" + String.Format("{0:yyyy.dd.MM.H.mm.ss.ffffff}", DateTime.Now);
+			name = name + extension;
+			return name;
+		}
+
+		internal List<Result> FindDuplicates(DirectoryInfo source, DirectoryInfo destination, bool moveDuplicates)
+		{
+			var resultDict = new List<Result>();
+			//var dirList = source.GetDirectories("*", SearchOption.AllDirectories);
+
+			var fileList = new List<FileInfo>();
+			var compareList = new List<FileInfo>();
+
+			var counter = source.GetFiles("*.*", SearchOption.AllDirectories);
+			TotalFiles = counter.Count();
+
+			//add root level files first
+			fileList.AddRange(source.GetFiles("*.*", SearchOption.AllDirectories));
+			compareList.AddRange(source.GetFiles("*.*", SearchOption.AllDirectories));
+
+			if (!destination.Exists)
+			{
+				destination.Create();
+			}
+
+			foreach (var file in fileList)
+			{
+				if (Worker.CancellationPending)
+				{
+					Worker.CancelAsync();
+					WorkerCancelled = true;
+					
+					var result = new Result("Operation cancelled.", string.Empty);
+					resultDict.Add(result);
+					return resultDict;
+				}
+
+				foreach (var compare in compareList)
+				{
+					var fileFi = new FileInfo(file.FullName);
+					var compareFi = new FileInfo(compare.FullName);
+
+					if (fileFi.Exists && compareFi.Exists && file.FullName != compare.FullName)
+					{
+						//check if exists first before trying to compare or the filestream in FilesAreEqual will throw an exception
+						if (FilesAreEqual(file, compare))
+						{
+							var kvp = new Result(file.FullName, compare.FullName);
+							var kvp2 = new Result(compare.FullName, file.FullName);
+
+							if (!resultDict.Contains(kvp) && !resultDict.Contains(kvp2))
+							{
+								resultDict.Add(kvp);
+
+								//resultDict.Add(file.FullName, compare.FullName);
+								//var newFileName = String.Format("{0}-{1}", file.Name, compare.Name);
+
+								//determine the sub path
+								var destFile = new FileInfo(compare.FullName.Replace(source.FullName, destination.FullName));
+								var destPath = new DirectoryInfo(Path.GetDirectoryName(destFile.FullName));
+
+								if (moveDuplicates)
+								{
+									if (!destPath.Exists)
+									{
+										destPath.Create();
+									}
+
+									if (destFile.Exists)
+									{
+										destFile.Delete();
+									}
+
+									compare.MoveTo(destFile.FullName);
+								}
+							}
+						}
+					}
+				}
+
+				//increment counter property
+				FilesProcessed++;
+				Worker.ReportProgress(FilesProcessed / TotalFiles);
+			}
+
+			WorkerCancelled = false;
+			return resultDict;
+		}
+
+		static bool FilesAreEqual(FileInfo first, FileInfo second)
+		{
+
+			if (first.Length != second.Length)
+				return false;
+
+			int iterations = (int)Math.Ceiling((double)first.Length / BYTES_TO_READ);
+
+			using (FileStream fs1 = first.OpenRead())
+			using (FileStream fs2 = second.OpenRead())
+			{
+				byte[] one = new byte[BYTES_TO_READ];
+				byte[] two = new byte[BYTES_TO_READ];
+
+				for (int i = 0; i < iterations; i++)
+				{
+					fs1.Read(one, 0, BYTES_TO_READ);
+					fs2.Read(two, 0, BYTES_TO_READ);
+
+					if (BitConverter.ToInt64(one, 0) != BitConverter.ToInt64(two, 0))
+						return false;
+				}
+			}
+
+			return true;
+		}
+		#endregion Recursive copy
+
+		#region Sorting
+		//public static List<FileInfo> Sort(FileInfo[] fileList)
+		//{
+		//    List<FileInfo> newList = fileList.ToList();
+		//    newList.ToList().Sort((a, b) => String.CompareOrdinal(a.Name, b.Name));
+		//    return newList;
+		//}
 
 		public static List<DirectoryInfo> Sort(DirectoryInfo[] dirList)
 		{
@@ -612,60 +1223,12 @@ namespace FileUtilities
 		private static int SelectedTabIndex { get; set; }
 		public static ConstraintTypes ConstraintType { get; set; }
 		public static int Constraint { get; set; }
+		public List<Result> Duplicates { get; set; }
         
 		#endregion Properties
 
-		private void cmdCancel_MouseLeave(object sender, EventArgs e)
-		{
-			Cursor = Worker.IsBusy ? Cursors.WaitCursor : Cursors.Default;
-		}
 
-		private void txtSourceDirectory_Leave(object sender, EventArgs e)
-		{
-			Settings.Source = txtSourceDirectory.Text;
-			Settings.Save();
-		}
 
-		private void txtOutputDirectory_Leave(object sender, EventArgs e)
-		{
-			Settings.Destination = txtOutputDirectory.Text;
-			Settings.Save();
-		}
-
-		private void chkAddDashesToDates_CheckedChanged(object sender, EventArgs e)
-		{
-			Settings.AddDashesToDates = chkAddDashesToDates.Checked;
-			Settings.Save();
-		}
-
-		private void chkOverwrite_CheckedChanged(object sender, EventArgs e)
-		{
-			Settings.Overwrite = chkOverwrite.Checked;
-			Settings.Save();
-		}
-
-		private void chkSortCopy_CheckedChanged(object sender, EventArgs e)
-		{
-			Settings.CopyWhenSorting = chkSortCopy.Checked;
-			Settings.Save();
-		}
-		
-		private void cmdCancel_MouseHover(object sender, EventArgs e)
-		{
-			Cursor = Cursors.Default;
-		}
-
-		private void chkSkipExisting_CheckedChanged(object sender, EventArgs e)
-		{
-			Settings.Skip = chkSkipExisting.Checked;
-			Settings.Save();
-		}
-
-		private void chkUseYearMonthDir_CheckedChanged(object sender, EventArgs e)
-		{
-			Settings.UseMonthSubDirs = chkUseYearMonthDir.Checked;
-			Settings.Save();
-		}
 	}
 
 }
