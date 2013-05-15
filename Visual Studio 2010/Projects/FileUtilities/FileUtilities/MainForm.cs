@@ -279,20 +279,20 @@ namespace FileUtilities
 
 		private void MainForm_Activated(object sender, EventArgs e)
 		{
-			if (SelectedTabIndex == Convert.ToInt32(Tabs.Duplicates))
-			{
-				//disable destination directory unless move is specified
-				if (chkMoveDuplicates.Checked)
-				{
-					txtOutputDirectory.Enabled = true;
-					btnOutputBrowse.Enabled = true;
-				}
-				else
-				{
-					txtOutputDirectory.Enabled = false;
-					btnOutputBrowse.Enabled = false;
-				}
-			}
+			//if (SelectedTabIndex == Convert.ToInt32(Tabs.Duplicates))
+			//{
+			//    //disable destination directory unless move is specified
+			//    if (chkMoveDuplicates.Checked)
+			//    {
+			//        txtOutputDirectory.Enabled = true;
+			//        btnOutputBrowse.Enabled = true;
+			//    }
+			//    else
+			//    {
+			//        txtOutputDirectory.Enabled = false;
+			//        btnOutputBrowse.Enabled = false;
+			//    }
+			//}
 		}
 
 		#endregion Form Events
