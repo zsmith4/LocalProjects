@@ -852,7 +852,7 @@ namespace FileUtilities
 
 		internal void Organize(DirectoryInfo source, DirectoryInfo dest, bool addDashesToDates, bool overwrite, bool skip, bool useMonthSubDirs)
 		{
-			string newDirName = string.Empty;
+            string newDirName = string.Empty;
 			string sourceDirName = string.Empty;
 			string dirNewName = string.Empty;
 
@@ -1227,7 +1227,32 @@ namespace FileUtilities
         
 		#endregion Properties
 
+        private void cmdChangeDate(object sender, EventArgs e)
+        {
 
+            var source = new DirectoryInfo(Settings.Default.Source);
+            var date = new DateTime(datePickerChangeDate.Value.Year, datePickerChangeDate.Value.Month, datePickerChangeDate.Value.Day);
+            
+            var confirm = MessageBox.Show(String.Format("Change create date on all files in '{0}' to '{1:MM/dd/yyyy}'?", source, date), "Change Date", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+            if (confirm == DialogResult.Yes)
+            { 
+                ChangeDate(source, date);
+            }
+   
+        }
+        
+        public void ChangeDate(DirectoryInfo source, DateTime setDateTime)
+        {
+            var files = source.GetFiles("*.*", SearchOption.TopDirectoryOnly);
+            foreach (var file in files)
+            {
+                file.LastWriteTime = setDateTime;
+                file.CreationTime = setDateTime;
+                file.LastAccessTime = setDateTime;
+            }
+
+            MessageBox.Show("Operation Complete", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
 
 	}
 
